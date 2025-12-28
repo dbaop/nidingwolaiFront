@@ -1,0 +1,68 @@
+<!-- register.wxml - 注册页面 -->
+<view class="container">
+  <view class="register-form">
+    <view class="logo">
+      <text class="logo-text">你定我来</text>
+    </view>
+    
+    <view class="form-group">
+      <view class="input-wrapper">
+        <text class="input-label">手机号</text>
+        <input 
+          class="input" 
+          placeholder="请输入手机号" 
+          type="number" 
+          bindinput="onPhoneInput" 
+        />
+      </view>
+    </view>
+    
+    <view class="form-group">
+      <view class="input-wrapper">
+        <text class="input-label">昵称</text>
+        <input 
+          class="input" 
+          placeholder="请输入昵称" 
+          bindinput="onNicknameInput" 
+        />
+      </view>
+    </view>
+    
+    <view class="form-group">
+      <view class="input-wrapper">
+        <text class="input-label">密码</text>
+        <input 
+          class="input" 
+          placeholder="请输入密码（至少6位）" 
+          password="true" 
+          bindinput="onPasswordInput" 
+        />
+      </view>
+    </view>
+    
+    <view class="form-group">
+      <view class="input-wrapper">
+        <text class="input-label">确认密码</text>
+        <input 
+          class="input" 
+          placeholder="请再次输入密码" 
+          password="true" 
+          bindinput="onConfirmPasswordInput" 
+        />
+      </view>
+    </view>
+    
+    <button 
+      class="register-btn" 
+      type="primary" 
+      bindtap="register"
+      disabled="{{!phone || !password || !confirmPassword || !nickname || password !== confirmPassword}}">
+      注册
+    </button>
+    
+    <view class="login-link">
+      <text>已有账号？</text>
+      <text class="login-text" bindtap="goToLogin">立即登录</text>
+    </view>
+  </view>
+</view>

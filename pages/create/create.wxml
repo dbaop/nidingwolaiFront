@@ -1,0 +1,215 @@
+<!-- 创建活动页 -->
+<view class="container">
+  <form bindsubmit="onFormSubmit" catchsubmit="onFormSubmit">
+    <!-- 活动类型 -->
+    <view class="form-section">
+      <text class="section-title">活动类型</text>
+      <radio-group class="radio-group" bindchange="onActivityTypeChange" value="{{activityType}}">
+        <label class="radio-item">
+          <radio value="k歌" checked="{{activityType == 'k歌'}}"></radio>
+          <text>K歌</text>
+        </label>
+        <label class="radio-item">
+          <radio value="剧本杀" checked="{{activityType == '剧本杀'}}"></radio>
+          <text>剧本杀</text>
+        </label>
+        <label class="radio-item">
+          <radio value="桌游" checked="{{activityType == '桌游'}}"></radio>
+          <text>桌游</text>
+        </label>
+        <label class="radio-item">
+          <radio value="爬山" checked="{{activityType == '爬山'}}"></radio>
+          <text>爬山</text>
+        </label>
+        <label class="radio-item">
+          <radio value="其他" checked="{{activityType == '其他'}}"></radio>
+          <text>其他</text>
+        </label>
+      </radio-group>
+    </view>
+
+    <!-- 活动标题 -->
+    <view class="form-section">
+      <text class="section-title">活动标题</text>
+      <input class="form-input" name="title" placeholder="请输入活动标题（如：周末K歌局，寻找麦霸队友）" bindinput="onTitleInput" value="{{title}}" />
+    </view>
+
+    <!-- 活动时间 -->
+    <view class="form-section">
+      <text class="section-title">活动时间</text>
+      
+      <view class="time-picker-container">
+        <text class="time-label">开始时间</text>
+        <picker mode="datetime" bindchange="onTimeChange" value="{{dateTime}}">
+          <view class="time-picker-display">
+            {{formattedTime || '请选择活动开始时间'}}
+          </view>
+        </picker>
+      </view>
+      
+      <view class="time-picker-container">
+        <text class="time-label">结束时间</text>
+        <picker mode="datetime" bindchange="onEndTimeChange" value="{{endDateTime}}" start="{{minEndTime}}">
+          <view class="time-picker-display">
+            {{formattedEndTime || '请选择活动结束时间'}}
+          </view>
+        </picker>
+      </view>
+    </view>
+
+    <!-- 活动地点 -->
+    <view class="form-section">
+      <text class="section-title">活动地点</text>
+      <view class="location-input">
+        <input class="form-input" name="location" placeholder="请输入活动地点" bindinput="onLocationInput" value="{{location}}" />
+        <button class="location-btn" bindtap="onChooseLocation">定位</button>
+      </view>
+    </view>
+
+    <!-- 活动图片 -->
+    <view class="form-section">
+      <text class="section-title">活动图片</text>
+      <view class="image-upload">
+        <view class="image-preview" bindtap="onChooseImage">
+          <image wx:if="{{activityImageUrl}}" src="{{activityImageUrl}}" mode="aspectFill"></image>
+          <view wx:else class="image-placeholder">
+            <text class="image-placeholder-text">点击上传活动图片</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 人数设置 -->
+    <view class="form-section">
+      <text class="section-title">人数设置</text>
+      <view class="people-count">
+        <view class="count-row">
+          <view class="count-container">
+            <view class="count-info">
+              <text class="count-label">当前已有</text>
+              <text class="count-value">{{currentPeople}}</text>
+              <text class="count-unit">人</text>
+            </view>
+            <view class="count-control">
+              <button class="count-btn" bindtap="decreaseCurrent" disabled="{{currentPeople <= 1}}">
+                <text class="btn-text">-</text>
+              </button>
+              <button class="count-btn" bindtap="increaseCurrent" disabled="{{currentPeople >= totalPeople}}">
+                <text class="btn-text">+</text>
+              </button>
+            </view>
+          </view>
+          <view class="count-container">
+            <view class="count-info">
+              <text class="count-label">总共需要</text>
+              <text class="count-value">{{totalPeople}}</text>
+              <text class="count-unit">人</text>
+            </view>
+            <view class="count-control">
+              <button class="count-btn" bindtap="decreaseTotal" disabled="{{totalPeople <= currentPeople}}">
+                <text class="btn-text">-</text>
+              </button>
+              <button class="count-btn" bindtap="increaseTotal" disabled="{{totalPeople >= 20}}">
+                <text class="btn-text">+</text>
+              </button>
+            </view>
+          </view>
+        </view>
+        <view class="people-progress">
+          <view class="progress-bar">
+            <view class="progress-fill" style="width: {{(currentPeople/totalPeople)*100}}%"></view>
+          </view>
+          <text class="progress-text">{{currentPeople}}/{{totalPeople}} 人 ({{Math.floor((currentPeople/totalPeople)*100)}}%)</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 包厢类型 -->
+    <view class="form-section" wx:if="{{activityType == 'k歌'}}">
+      <text class="section-title">包厢类型</text>
+      <radio-group class="radio-group" bindchange="onBoxTypeChange" value="{{boxType}}">
+        <label class="radio-item">
+          <radio value="小包" checked="{{boxType == '小包'}}"></radio>
+          <text>小包 (2-4人)</text>
+        </label>
+        <label class="radio-item">
+          <radio value="中包" checked="{{boxType == '中包'}}"></radio>
+          <text>中包 (5-8人)</text>
+        </label>
+        <label class="radio-item">
+          <radio value="大包" checked="{{boxType == '大包'}}"></radio>
+          <text>大包 (9-12人)</text>
+        </label>
+        <label class="radio-item">
+          <radio value="豪华包" checked="{{boxType == '豪华包'}}"></radio>
+          <text>豪华包 (13人以上)</text>
+        </label>
+      </radio-group>
+    </view>
+
+    <!-- 曲风偏好 -->
+    <view class="form-section" wx:if="{{activityType == 'k歌'}}">
+      <text class="section-title">曲风偏好</text>
+      <view class="tags-container">
+        <view wx:for="{{availableTags}}" wx:key="index" class="tag-item {{selectedTags.indexOf(item) !== -1 ? 'selected' : ''}}" bindtap="toggleTag" data-tag="{{item}}">
+          {{item}}
+        </view>
+      </view>
+      <input type="hidden" name="tags" value="{{selectedTags.join(',')}}" />
+    </view>
+
+    <!-- 费用说明 -->
+    <view class="form-section">
+      <text class="section-title">费用说明</text>
+      <input class="form-input" name="price" type="number" placeholder="请输入人均费用（元）" bindinput="onPriceInput" value="{{price}}" />
+      <text class="price-hint">* 填写人均费用，活动结束后将按此金额AA</text>
+    </view>
+
+    <!-- 活动规则 -->
+    <view class="form-section">
+      <text class="section-title">活动规则</text>
+      
+      <!-- 报名截止时间 -->
+      <view class="rule-item">
+        <text class="rule-label">报名截止时间</text>
+        <picker bindchange="onRegistrationDeadlineChange" value="{{registrationDeadline}}" range="{{['0.5', '1', '2', '3', '6', '12', '24']}}" range-key="{{item}}">
+          <view class="picker">
+            活动{{registrationDeadline}}小时前停止报名
+          </view>
+        </picker>
+      </view>
+      
+      <!-- 押金设置 -->
+      <view class="rule-item">
+        <text class="rule-label">是否需要押金</text>
+        <switch class="rule-switch" bindchange="onDepositChange" checked="{{hasDeposit}}" />
+      </view>
+      
+      <!-- 押金金额和规则 -->
+      <view wx:if="{{hasDeposit}}" class="deposit-rules">
+        <view class="rule-item">
+          <text class="rule-label">押金金额（元）</text>
+          <input class="form-input small-input" type="digit" placeholder="请输入押金金额" bindinput="onDepositAmountInput" value="{{depositAmount}}" />
+        </view>
+        
+        <view class="rule-item">
+          <text class="rule-label">押金不退规则</text>
+          <picker bindchange="onDepositRuleChange" value="{{depositRule}}" range="{{['0.5', '1', '2', '3', '6', '12', '24']}}" range-key="{{item}}">
+            <view class="picker">
+              活动{{depositRule}}小时前取消不退押金
+            </view>
+          </picker>
+        </view>
+      </view>
+    </view>
+
+    <!-- 活动描述 -->
+    <view class="form-section">
+      <text class="section-title">活动描述</text>
+      <textarea class="form-textarea" name="description" placeholder="请详细描述活动内容、要求或注意事项（如：希望来点会唱周杰伦的，纯放松局，跑调欢迎）" bindinput="onDescriptionInput" value="{{description}}" />
+    </view>
+
+    <!-- 提交按钮 -->
+    <button class="submit-btn" formType="submit" disabled="{{!canSubmit}}">创建活动</button>
+  </form>
+</view>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate SVG Images</title>
+</head>
+<body>
+    <h1>SVG Image Generator</h1>
+    <div id="svgs" style="display:none;"></div>
+    <button onclick="generateAllImages()">Generate All Images</button>
+    <div id="status"></div>
+
+    <script>
+        // Image definitions
+        const imageDefinitions = [
+            // TabBar icons (81x81 pixels)
+            { name: 'home.png', width: 81, height: 81, svg: '<svg xmlns="http://www.w3.org/2000/svg" width="81" height="81" viewBox="0 0 81 81"><rect width="81" height="81" fill="#FFB6C1"/><text x="40.5" y="45.5" font-family="Arial" font-size="30" text-anchor="middle" fill="white">H</text></svg>' },
+            { name: 'home-active.png', width: 81, height: 81, svg: '<svg xmlns="http://www.w3.org/2000/svg" width="81" height="81" viewBox="0 0 81 81"><rect width="81" height="81" fill="#FF69B4"/><text x="40.5" y="45.5" font-family="Arial" font-size="30" text-anchor="middle" fill="white">H</text></svg>' },
+            { name: 'create.png', width: 81, height: 81, svg: '<svg xmlns="http://www.w3.org/2000/svg" width="81" height="81" viewBox="0 0 81 81"><rect width="81" height="81" fill="#ADD8E6"/><text x="40.5" y="45.5" font-family="Arial" font-size="30" text-anchor="middle" fill="white">+</text></svg>' },
+            { name: 'create-active.png', width: 81, height: 81, svg: '<svg xmlns="http://www.w3.org/2000/svg" width="81" height="81" viewBox="0 0 81 81"><rect width="81" height="81" fill="#4682B4"/><text x="40.5" y="45.5" font-family="Arial" font-size="30" text-anchor="middle" fill="white">+</text></svg>' },
+            { name: 'activity.png', width: 81, height: 81, svg: '<svg xmlns="http://www.w3.org/2000/svg" width="81" height="81" viewBox="0 0 81 81"><rect width="81" height="81" fill="#90EE90"/><text x="40.5" y="45.5" font-family="Arial" font-size="30" text-anchor="middle" fill="white">A</text></svg>' },
+            { name: 'activity-active.png', width: 81, height: 81, svg: '<svg xmlns="http://www.w3.org/2000/svg" width="81" height="81" viewBox="0 0 81 81"><rect width="81" height="81" fill="#32CD32"/><text x="40.5" y="45.5" font-family="Arial" font-size="30" text-anchor="middle" fill="white">A</text></svg>' },
+            { name: 'profile.png', width: 81, height: 81, svg: '<svg xmlns="http://www.w3.org/2000/svg" width="81" height="81" viewBox="0 0 81 81"><rect width="81" height="81" fill="#FFDAB9"/><text x="40.5" y="45.5" font-family="Arial" font-size="30" text-anchor="middle" fill="white">P</text></svg>' },
+            { name: 'profile-active.png', width: 81, height: 81, svg: '<svg xmlns="http://www.w3.org/2000/svg" width="81" height="81" viewBox="0 0 81 81"><rect width="81" height="81" fill="#FFA500"/><text x="40.5" y="45.5" font-family="Arial" font-size="30" text-anchor="middle" fill="white">P</text></svg>' },
+            
+            // Category icons (80x80 pixels)
+            { name: 'karaoke.png', width: 80, height: 80, svg: '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><rect width="80" height="80" fill="#FF6B8B"/><text x="40" y="45" font-family="Arial" font-size="20" text-anchor="middle" fill="white">K歌</text></svg>' },
+            { name: 'script.png', width: 80, height: 80, svg: '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><rect width="80" height="80" fill="#4BCF99"/><text x="40" y="45" font-family="Arial" font-size="16" text-anchor="middle" fill="white">剧本杀</text></svg>' },
+            { name: 'boardgame.png', width: 80, height: 80, svg: '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><rect width="80" height="80" fill="#FFCE54"/><text x="40" y="45" font-family="Arial" font-size="20" text-anchor="middle" fill="white">桌游</text></svg>' },
+            { name: 'hiking.png', width: 80, height: 80, svg: '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><rect width="80" height="80" fill="#5D9CEC"/><text x="40" y="45" font-family="Arial" font-size="20" text-anchor="middle" fill="white">徒步</text></svg>' },
+            { name: 'dinner.png', width: 80, height: 80, svg: '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><rect width="80" height="80" fill="#A0D468"/><text x="40" y="45" font-family="Arial" font-size="20" text-anchor="middle" fill="white">聚餐</text></svg>' },
+            
+            // Activity images (same size as category icons)
+            { name: 'karaoke1.png', width: 80, height: 80, svg: '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><rect width="80" height="80" fill="#FF6B8B"/><text x="40" y="45" font-family="Arial" font-size="20" text-anchor="middle" fill="white">K歌</text></svg>' },
+            { name: 'script1.png', width: 80, height: 80, svg: '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><rect width="80" height="80" fill="#4BCF99"/><text x="40" y="45" font-family="Arial" font-size="16" text-anchor="middle" fill="white">剧本杀</text></svg>' },
+            { name: 'boardgame1.png', width: 80, height: 80, svg: '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><rect width="80" height="80" fill="#FFCE54"/><text x="40" y="45" font-family="Arial" font-size="20" text-anchor="middle" fill="white">桌游</text></svg>' },
+            { name: 'hiking1.png', width: 80, height: 80, svg: '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><rect width="80" height="80" fill="#5D9CEC"/><text x="40" y="45" font-family="Arial" font-size="20" text-anchor="middle" fill="white">徒步</text></svg>' },
+            
+            // Avatar images (circular avatars)
+            { name: 'avatar1.png', width: 60, height: 60, svg: '<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 60 60"><circle cx="30" cy="30" r="30" fill="#FF6384"/><text x="30" y="35" font-family="Arial" font-size="16" text-anchor="middle" fill="white">U1</text></svg>' },
+            { name: 'avatar2.png', width: 60, height: 60, svg: '<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 60 60"><circle cx="30" cy="30" r="30" fill="#36A2EB"/><text x="30" y="35" font-family="Arial" font-size="16" text-anchor="middle" fill="white">U2</text></svg>' },
+            { name: 'avatar3.png', width: 60, height: 60, svg: '<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 60 60"><circle cx="30" cy="30" r="30" fill="#FFCD56"/><text x="30" y="35" font-family="Arial" font-size="16" text-anchor="middle" fill="white">U3</text></svg>' },
+            { name: 'avatar4.png', width: 60, height: 60, svg: '<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 60 60"><circle cx="30" cy="30" r="30" fill="#4BC0C0"/><text x="30" y="35" font-family="Arial" font-size="16" text-anchor="middle" fill="white">U4</text></svg>' },
+            { name: 'avatar5.png', width: 60, height: 60, svg: '<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 60 60"><circle cx="30" cy="30" r="30" fill="#9966FF"/><text x="30" y="35" font-family="Arial" font-size="16" text-anchor="middle" fill="white">U5</text></svg>' },
+            { name: 'avatar6.png', width: 60, height: 60, svg: '<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 60 60"><circle cx="30" cy="30" r="30" fill="#FF9F40"/><text x="30" y="35" font-family="Arial" font-size="16" text-anchor="middle" fill="white">U6</text></svg>' },
+            { name: 'avatar7.png', width: 60, height: 60, svg: '<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 60 60"><circle cx="30" cy="30" r="30" fill="#C9CBcf"/><text x="30" y="35" font-family="Arial" font-size="16" text-anchor="middle" fill="white">U7</text></svg>' }
+        ];
+
+        function generateAllImages() {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = 'Generating images...';
+            
+            // Clear existing images
+            const svgsDiv = document.getElementById('svgs');
+            svgsDiv.innerHTML = '';
+            
+            // Generate all images
+            let count = 0;
+            imageDefinitions.forEach(def => {
+                const img = document.createElement('img');
+                img.src = 'data:image/svg+xml;base64,' + btoa(def.svg);
+                img.alt = def.name;
+                img.style.display = 'none';
+                svgsDiv.appendChild(img);
+                
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = def.width;
+                    canvas.height = def.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    
+                    // Convert to data URL and trigger download
+                    const dataURL = canvas.toDataURL('image/png');
+                    const link = document.createElement('a');
+                    link.href = dataURL;
+                    link.download = def.name;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    count++;
+                    statusDiv.innerHTML = `Generated ${count}/${imageDefinitions.length} images`;
+                };
+            });
+        }
+    </script>
+</body>
+</html>
