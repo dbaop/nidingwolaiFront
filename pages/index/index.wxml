@@ -1,0 +1,89 @@
+<!-- 首页 -->
+<view class="container">
+
+
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <input class="search-input" placeholder="搜索活动、地点或标签" bindinput="onSearchInput" />
+    <image class="search-icon" src="https://picsum.photos/seed/search/20/20"></image>
+  </view>
+
+  <!-- 活动分类 -->
+  <view class="category-section">
+    <scroll-view scroll-x="true" class="category-scroll">
+      <view class="category-item {{currentCategory == 'k歌' ? 'active' : ''}}" bindtap="switchCategory" data-category="k歌">
+        <image class="category-icon" src="https://picsum.photos/seed/karaoke/40/40"></image>
+        <text class="category-text">K歌</text>
+      </view>
+      <view class="category-item {{currentCategory == '剧本杀' ? 'active' : ''}}" bindtap="switchCategory" data-category="剧本杀">
+        <image class="category-icon" src="https://picsum.photos/seed/script/40/40"></image>
+        <text class="category-text">剧本杀</text>
+      </view>
+      <view class="category-item {{currentCategory == '桌游' ? 'active' : ''}}" bindtap="switchCategory" data-category="桌游">
+        <image class="category-icon" src="https://picsum.photos/seed/boardgame/40/40"></image>
+        <text class="category-text">桌游</text>
+      </view>
+      <view class="category-item {{currentCategory == '爬山' ? 'active' : ''}}" bindtap="switchCategory" data-category="爬山">
+        <image class="category-icon" src="https://picsum.photos/seed/hiking/40/40"></image>
+        <text class="category-text">爬山</text>
+      </view>
+      <view class="category-item {{currentCategory == '饭局' ? 'active' : ''}}" bindtap="switchCategory" data-category="饭局">
+        <image class="category-icon" src="https://picsum.photos/seed/dinner/40/40"></image>
+        <text class="category-text">饭局</text>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 附近活动列表 -->
+  <view class="activity-section">
+    <!-- 加载状态 -->
+    <view wx:if="{{loading}}" class="loading-container">
+      <view class="loading-spinner"></view>
+      <text>加载中...</text>
+    </view>
+    
+    <!-- 错误提示 -->
+    <view wx:elif="{{error}}" class="error-container">
+      <image src="https://picsum.photos/seed/empty/200/200"></image>
+      <text>{{error}}</text>
+      <button class="retry-btn" bindtap="loadActivities">重新加载</button>
+    </view>
+    
+    <!-- 活动列表 -->
+    <view wx:else>
+      <view class="section-title">
+        <text class="title-text">附近的活动</text>
+        <text class="more-text" bindtap="onMoreClick">更多</text>
+      </view>
+      
+      <view class="activity-list">
+        <view class="activity-card" wx:for="{{activities}}" wx:key="id" bindtap="goToActivityDetail" data-id="{{item.id}}">
+          <image class="activity-image" src="{{item.imageWithFallback}}" mode="aspectFill"></image>
+          <view class="activity-info">
+            <view class="activity-header">
+              <text class="activity-title">{{item.title}}</text>
+              <text class="activity-price">¥{{item.price}}/人</text>
+            </view>
+            <view class="activity-meta">
+              <image class="meta-icon" src="https://picsum.photos/seed/time/20/20"></image>
+              <text class="meta-text">{{item.time}}</text>
+            </view>
+            <view class="activity-meta">
+              <image class="meta-icon" src="https://picsum.photos/seed/location/20/20"></image>
+              <text class="meta-text">{{item.location}}</text>
+            </view>
+            <view class="activity-participants">
+              <text class="participants-text">已有 {{item.currentPeople}}/{{item.totalPeople}} 人</text>
+              <view class="participants-avatars">
+                <image class="avatar" wx:for="{{item.avatarsWithFallback}}" wx:for-item="avatar" wx:key="index" src="{{avatar}}"></image>
+              </view>
+            </view>
+            <view class="activity-tags">
+              <text class="tag" wx:for="{{item.tags}}" wx:key="index">{{item}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

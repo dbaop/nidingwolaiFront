@@ -1,0 +1,16 @@
+<!-- 测试时间选择器 -->
+<view>
+  <text>开始时间</text>
+  <picker mode="datetime" bindchange="onTimeChange" value="{{dateTime}}">
+    <view style="height: 80rpx; background: #fff; border: 1rpx solid #ccc; padding: 10rpx;">
+      {{dateTime || '请选择开始时间'}}
+    </view>
+  </picker>
+  
+  <text>结束时间</text>
+  <picker mode="datetime" bindchange="onEndTimeChange" value="{{endDateTime}}" start="{{minEndTime}}">
+    <view style="height: 80rpx; background: #fff; border: 1rpx solid #ccc; padding: 10rpx;">
+      {{endDateTime || '请选择结束时间'}}
+    </view>
+  </picker>
+</view>

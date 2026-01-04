@@ -1,0 +1,110 @@
+<!-- activity.wxml -->
+<view class="container">
+  <!-- 活动分类标签 -->
+  <view class="activity-tabs">
+    <scroll-view scroll-x="true" class="tabs-scroll">
+      <view class="tab-item {{activeTab === 'joined' ? 'active' : ''}}" bindtap="switchTab" data-tab="joined">
+        <text>已报名</text>
+      </view>
+      <view class="tab-item {{activeTab === 'created' ? 'active' : ''}}" bindtap="switchTab" data-tab="created">
+        <text>我创建的</text>
+      </view>
+      <view class="tab-item {{activeTab === 'history' ? 'active' : ''}}" bindtap="switchTab" data-tab="history">
+        <text>历史活动</text>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 活动列表 -->
+  <view class="activity-list">
+    <!-- 加载状态 -->
+    <view wx:if="{{loading}}" class="loading-container">
+      <view class="loading-spinner"></view>
+      <text>加载中...</text>
+    </view>
+    
+    <!-- 非加载状态 -->
+    <view wx:else>
+      <!-- 已报名活动 -->
+      <view wx:if="{{activeTab === 'joined'}}" class="tab-content">
+        <view class="activity-card" wx:for="{{joinedActivities}}" wx:key="id" bindtap="goToActivityDetail" data-id="{{item.id}}">
+          <image class="activity-image" src="{{item.image}}"></image>
+          <view class="activity-info">
+            <view class="activity-title">{{item.title}}</view>
+            <view class="activity-meta">
+              <text class="time">{{item.time}}</text>
+              <text class="location">{{item.location}}</text>
+            </view>
+            <view class="activity-status">
+              <view class="status-tag {{item.status === 'upcoming' ? 'upcoming' : 'ongoing'}}">
+                {{item.status === 'upcoming' ? '即将开始' : '进行中'}}
+              </view>
+              <text class="people">{{item.currentPeople}}/{{item.totalPeople}}人</text>
+            </view>
+          </view>
+        </view>
+        
+        <!-- 空状态 -->
+        <view wx:if="{{joinedActivities.length === 0}}" class="empty-state">
+          <image src="../../images/empty.png"></image>
+          <text>暂无已报名的活动</text>
+          <button class="btn btn-primary" bindtap="goToCreate">去创建活动</button>
+        </view>
+      </view>
+
+      <!-- 我创建的活动 -->
+      <view wx:if="{{activeTab === 'created'}}" class="tab-content">
+        <view class="activity-card" wx:for="{{createdActivities}}" wx:key="id" bindtap="goToActivityDetail" data-id="{{item.id}}">
+          <image class="activity-image" src="{{item.image}}"></image>
+          <view class="activity-info">
+            <view class="activity-title">{{item.title}}</view>
+            <view class="activity-meta">
+              <text class="time">{{item.time}}</text>
+              <text class="location">{{item.location}}</text>
+            </view>
+            <view class="activity-status">
+              <view class="status-tag {{item.status === 'upcoming' ? 'upcoming' : item.status === 'ongoing' ? 'ongoing' : 'completed'}}">
+                {{item.status === 'upcoming' ? '即将开始' : item.status === 'ongoing' ? '进行中' : '已结束'}}
+              </view>
+              <text class="people">{{item.currentPeople}}/{{item.totalPeople}}人</text>
+            </view>
+          </view>
+        </view>
+        
+        <!-- 空状态 -->
+        <view wx:if="{{createdActivities.length === 0}}" class="empty-state">
+          <image src="../../images/empty.png"></image>
+          <text>暂无创建的活动</text>
+          <button class="btn btn-primary" bindtap="goToCreate">去创建活动</button>
+        </view>
+      </view>
+
+      <!-- 历史活动 -->
+      <view wx:if="{{activeTab === 'history'}}" class="tab-content">
+        <view class="activity-card" wx:for="{{historyActivities}}" wx:key="id" bindtap="goToActivityDetail" data-id="{{item.id}}">
+          <image class="activity-image" src="{{item.image}}"></image>
+          <view class="activity-info">
+            <view class="activity-title">{{item.title}}</view>
+            <view class="activity-meta">
+              <text class="time">{{item.time}}</text>
+              <text class="location">{{item.location}}</text>
+            </view>
+            <view class="activity-status">
+              <view class="status-tag completed">
+                已结束
+              </view>
+              <text class="people">{{item.currentPeople}}/{{item.totalPeople}}人</text>
+            </view>
+          </view>
+        </view>
+        
+        <!-- 空状态 -->
+        <view wx:if="{{historyActivities.length === 0}}" class="empty-state">
+          <image src="/images/empty.png"></image>
+          <text>暂无历史活动</text>
+          <button class="btn btn-primary" bindtap="goToCreate">去创建活动</button>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

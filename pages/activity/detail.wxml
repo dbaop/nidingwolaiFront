@@ -1,0 +1,83 @@
+<!-- detail.wxml -->
+<view class="container">
+  <!-- 加载提示 -->
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <!-- 活动详情 -->
+  <view class="activity-detail" wx:else>
+    <!-- 活动标题 -->
+    <view class="activity-title">
+      <text>{{activity.title}}</text>
+    </view>
+
+    <!-- 活动时间 -->
+    <view class="activity-info">
+      <view class="info-item">
+        <text class="info-label">时间：</text>
+        <text class="info-value">{{activity.start_time}} 至 {{activity.end_time}}</text>
+      </view>
+      <view class="info-item">
+        <text class="info-label">地点：</text>
+        <text class="info-value">{{activity.location}}</text>
+      </view>
+      <view class="info-item">
+        <text class="info-label">人数：</text>
+        <text class="info-value">{{activity.current_participants}}/{{activity.max_participants}}</text>
+      </view>
+      <view class="info-item">
+        <text class="info-label">费用：</text>
+        <text class="info-value">{{activity.cost_type}} - {{activity.estimated_cost_per_person || 0}}元/人</text>
+      </view>
+      <view class="info-item" wx:if="{{activity.deposit_amount > 0}}">
+        <text class="info-label">押金：</text>
+        <text class="info-value">{{activity.deposit_amount}}元</text>
+      </view>
+    </view>
+
+    <!-- 活动描述 -->
+    <view class="activity-description">
+      <text class="section-title">活动详情</text>
+      <text class="description-content">{{activity.description}}</text>
+    </view>
+
+    <!-- 活动规则 -->
+    <view class="activity-rules" wx:if="{{activity.requirements}}">
+      <text class="section-title">活动规则</text>
+      <text class="rules-content">{{activity.requirements}}</text>
+    </view>
+
+    <!-- 活动图片 -->
+    <view class="activity-image" wx:if="{{activity.cover_image_url}}">
+      <image src="{{activity.cover_image_url}}" mode="aspectFill"></image>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="action-buttons">
+      <!-- 已加入状态 -->
+      <view class="status-button" wx:if="{{hasJoined}}">
+        <text wx:if="{{enrollmentStatus === 'pending'}}" class="pending">申请中</text>
+        <text wx:elif="{{enrollmentStatus === 'approved'}}" class="approved">已通过</text>
+        <text wx:elif="{{enrollmentStatus === 'rejected'}}" class="rejected">已拒绝</text>
+        <text wx:elif="{{enrollmentStatus === 'attended'}}" class="attended">已完成</text>
+        <text wx:elif="{{enrollmentStatus === 'canceled'}}" class="canceled">已取消</text>
+      </view>
+      
+      <!-- 未加入状态 -->
+      <button 
+        wx:else 
+        type="primary" 
+        bindtap="applyToJoin"
+        disabled="{{activity.status !== 'active' || activity.current_participants >= activity.max_participants}}"
+      >
+        申请加入
+      </button>
+    </view>
+
+    <!-- 返回按钮 -->
+    <view class="back-button">
+      <button type="default" bindtap="backToList">返回列表</button>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,37 @@
+<!-- merchant/apply/apply.wxml -->
+<view class="container">
+  <view class="title">申请商家</view>
+  <form class="form" bindsubmit="onSubmit">
+    <view class="form-item">
+      <text class="label">商家名称</text>
+      <input name="business_name" placeholder="请输入商家名称" value="{{formData.business_name}}" bindinput="onInputChange"/>
+    </view>
+    <view class="form-item">
+      <text class="label">联系人</text>
+      <input name="contact_name" placeholder="请输入联系人姓名" value="{{formData.contact_name}}" bindinput="onInputChange"/>
+    </view>
+    <view class="form-item">
+      <text class="label">联系电话</text>
+      <input name="contact_phone" placeholder="请输入联系电话" value="{{formData.contact_phone}}" bindinput="onInputChange" type="number"/>
+    </view>
+    <view class="form-item">
+      <text class="label">商家地址</text>
+      <input name="address" placeholder="请输入商家地址" value="{{formData.address}}" bindinput="onInputChange"/>
+    </view>
+    <view class="form-item">
+      <text class="label">商家简介</text>
+      <textarea name="description" placeholder="请输入商家简介" value="{{formData.description}}" bindinput="onInputChange" auto-height/>
+    </view>
+    <view class="form-item">
+      <text class="label">资质证明</text>
+      <view class="upload-container">
+        <image wx:if="{{formData.license_image}}" src="{{formData.license_image}}" mode="aspectFit" class="uploaded-image"/>
+        <button wx:else class="upload-btn" bindtap="uploadImage">
+          <image src="/images/upload.png" class="upload-icon"/>
+          <text>上传资质证明</text>
+        </button>
+      </view>
+    </view>
+    <button class="submit-btn" type="primary" form-type="submit">提交申请</button>
+  </form>
+</view>

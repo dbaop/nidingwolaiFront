@@ -1,0 +1,7 @@
+<!-- merchant/review/review.wxml -->
+<view class="container">
+  <view class="title">商家审核</view>
+  <view class="content">
+    <text class="tip">商家审核功能开发中...</text>
+  </view>
+</view>
