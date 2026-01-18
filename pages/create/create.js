@@ -65,15 +65,30 @@ Page({
       userRole: app.globalData.userRole || 'user'
     });
     
-    // 不设置初始时间，让用户自己选择
+    // 初始化页面数据
     this.setData({
-      dateTime: '',
-      endDateTime: '',
-      formattedTime: '',
-      formattedEndTime: '',
-      // 设置默认值
+      // 时间选择器相关
+      startDate: '', // 开始日期
+      startTime: '', // 开始时间
+      endDate: '', // 结束日期
+      endTime: '', // 结束时间
+      formattedTime: '', // 格式化的开始时间
+      formattedEndTime: '', // 格式化的结束时间
+      
+      // 其他默认值
       registrationDeadline: '2', // 默认活动开始前2小时截止报名
       depositRule: '1' // 默认活动开始前1小时不取消押金不退
+    })
+    
+    console.log('页面数据初始化完成')
+  },
+
+  // 测试picker组件
+  testPicker: function() {
+    console.log('测试picker组件')
+    wx.showToast({
+      title: 'picker组件测试',
+      icon: 'none'
     })
   },
 
@@ -93,20 +108,47 @@ Page({
     const day = date.getDate().toString().padStart(2, '0')
     const hour = date.getHours().toString().padStart(2, '0')
     const minute = date.getMinutes().toString().padStart(2, '0')
-    // 微信小程序picker需要 YYYY-MM-DD HH:mm 格式
-    return `${year}-${month}-${day} ${hour}:${minute}`
+    // 微信小程序picker需要 YYYY-MM-DDTHH:mm 格式（注意T分隔符）
+    return `${year}-${month}-${day}T${hour}:${minute}`
   },
 
   // 格式化日期时间
-  formatDateTime: function (dateString) {
-    if (!dateString) return ''
-    const date = new Date(dateString)
+  formatDateTime: function (date) {
+    if (!date) return ''
+    
+    // 如果是字符串，转换为Date对象
+    if (typeof date === 'string') {
+      date = new Date(date)
+    }
+    
+    // 如果转换失败，返回空字符串
+    if (isNaN(date.getTime())) return ''
+    
     const year = date.getFullYear()
     const month = (date.getMonth() + 1).toString().padStart(2, '0')
     const day = date.getDate().toString().padStart(2, '0')
     const hour = date.getHours().toString().padStart(2, '0')
     const minute = date.getMinutes().toString().padStart(2, '0')
     return `${year}-${month}-${day} ${hour}:${minute}`
+  },
+
+  // 格式化日期时间为后端需要的格式（iOS兼容）
+  formatDateTimeForBackend: function (dateStr, timeStr) {
+    if (!dateStr || !timeStr) return ''
+    
+    // 解析日期和时间
+    const dateParts = dateStr.split('-')
+    const timeParts = timeStr.split(':')
+    
+    // 使用iOS兼容的格式：yyyy-MM-ddTHH:mm:ss
+    const year = dateParts[0]
+    const month = dateParts[1]
+    const day = dateParts[2]
+    const hour = timeParts[0]
+    const minute = timeParts[1]
+    const second = '00'
+    
+    return `${year}-${month}-${day}T${hour}:${minute}:${second}`
   },
 
   // 活动类型选择
@@ -125,49 +167,216 @@ Page({
     this.checkCanSubmit()
   },
 
-  onTimeChange: function (e) {
-    console.log('开始时间选择器事件触发:', e)
-    console.log('选择的值:', e.detail.value)
+  // 处理开始日期变化
+  onStartDateChange: function (e) {
+    console.log('开始日期变化:', e.detail.value)
+    this.setData({
+      startDate: e.detail.value
+    })
+    this.updateFormattedTime()
+  },
+
+  // 处理开始时间变化
+  onStartTimeChange: function (e) {
+    console.log('开始时间变化:', e.detail.value)
+    this.setData({
+      startTime: e.detail.value
+    })
+    this.updateFormattedTime()
+  },
+
+  // 处理结束日期变化
+  onEndDateChange: function (e) {
+    console.log('结束日期变化:', e.detail.value)
+    this.setData({
+      endDate: e.detail.value
+    })
+    this.updateFormattedEndTime()
+  },
+
+  // 处理结束时间变化
+  onEndTimeChange: function (e) {
+    console.log('结束时间变化:', e.detail.value)
+    this.setData({
+      endTime: e.detail.value
+    })
+    this.updateFormattedEndTime()
+  },
+
+  // 更新格式化的开始时间
+  updateFormattedTime: function () {
+    if (this.data.startDate && this.data.startTime) {
+      // 格式化日期：2026-01-18
+      const dateParts = this.data.startDate.split('-')
+      const formattedDate = `${dateParts[0]}年${dateParts[1]}月${dateParts[2]}日`
+      
+      // 格式化时间：14:30
+      const timeParts = this.data.startTime.split(':')
+      const formattedTime = `${timeParts[0]}:${timeParts[1]}`
+      
+      const formattedTimeStr = `${formattedDate} ${formattedTime}`
+      this.setData({
+        formattedTime: formattedTimeStr
+      })
+      
+      // 自动设置结束时间（开始时间加1小时）
+      const startDateTime = new Date(this.data.startDate + ' ' + this.data.startTime)
+      const endDateTime = new Date(startDateTime.getTime() + 60 * 60 * 1000)
+      const endDate = endDateTime.getFullYear() + '-' + 
+                    String(endDateTime.getMonth() + 1).padStart(2, '0') + '-' + 
+                    String(endDateTime.getDate()).padStart(2, '0')
+      const endTime = String(endDateTime.getHours()).padStart(2, '0') + ':' + 
+                    String(endDateTime.getMinutes()).padStart(2, '0')
+      
+      // 格式化结束时间
+      const endParts = endDate.split('-')
+      const formattedEndDate = `${endParts[0]}年${endParts[1]}月${endParts[2]}日`
+      const endTimeParts = endTime.split(':')
+      const formattedEndTime = `${endTimeParts[0]}:${endTimeParts[1]}`
+      
+      this.setData({
+        endDate: endDate,
+        endTime: endTime,
+        formattedEndTime: `${formattedEndDate} ${formattedEndTime}`
+      })
+      
+      this.checkCanSubmit()
+    }
+  },
+
+  // 更新格式化的结束时间
+  updateFormattedEndTime: function () {
+    if (this.data.endDate && this.data.endTime) {
+      // 格式化日期：2026-01-18
+      const dateParts = this.data.endDate.split('-')
+      const formattedDate = `${dateParts[0]}年${dateParts[1]}月${dateParts[2]}日`
+      
+      // 格式化时间：14:30
+      const timeParts = this.data.endTime.split(':')
+      const formattedTime = `${timeParts[0]}:${timeParts[1]}`
+      
+      const formattedEndTimeStr = `${formattedDate} ${formattedTime}`
+      this.setData({
+        formattedEndTime: formattedEndTimeStr
+      })
+      this.checkCanSubmit()
+    }
+  },
+
+  // 点击开始时间按钮
+  onTimePickerClick: function () {
+    console.log('点击开始时间按钮')
     
-    const dateTime = e.detail.value
-    if (!dateTime) {
+    // 使用wx.showActionSheet来显示时间选择选项
+    wx.showActionSheet({
+      itemList: ['1小时后', '2小时后', '明天同一时间'],
+      success: (res) => {
+        console.log('选择了时间选项:', res.tapIndex)
+        
+        const now = new Date()
+        let selectedDate
+        
+        switch (res.tapIndex) {
+          case 0: // 1小时后
+            selectedDate = new Date(now.getTime() + 60 * 60 * 1000)
+            break
+          case 1: // 2小时后
+            selectedDate = new Date(now.getTime() + 2 * 60 * 60 * 1000)
+            break
+          case 2: // 明天同一时间
+            selectedDate = new Date(now.getTime() + 24 * 60 * 60 * 1000)
+            break
+          default:
+            return
+        }
+        
+        // 格式化日期时间
+        const formattedTime = this.formatDateTime(selectedDate)
+        
+        // 更新页面数据
+        this.setData({
+          dateTime: selectedDate,
+          formattedTime: formattedTime
+        })
+        
+        console.log('设置开始时间:', formattedTime)
+        this.checkCanSubmit()
+      },
+      fail: (res) => {
+        console.log('取消选择时间:', res)
+      }
+    })
+  },
+
+  // 处理开始时间输入
+  onTimeInput: function (e) {
+    console.log('开始时间输入:', e.detail.value)
+    
+    const timeValue = e.detail.value
+    if (!timeValue) {
       console.log('时间值为空，返回')
       return
     }
     
-    // 计算开始时间加1分钟，作为结束时间的最小值
-    const minEndTime = new Date(new Date(dateTime).getTime() + 60 * 1000)
-    const minEndTimeStr = this.formatDateTimeForPicker(minEndTime)
-    
-    // 如果当前结束时间早于或等于新的开始时间，则更新结束时间
-    let newEndTime = this.data.endDateTime
-    if (!this.data.endDateTime || new Date(this.data.endDateTime) <= new Date(dateTime)) {
-      newEndTime = minEndTimeStr
+    // 解析时间值
+    const date = new Date(timeValue)
+    if (isNaN(date.getTime())) {
+      console.log('无效的日期时间值:', timeValue)
+      return
     }
     
-    console.log('设置数据:', {
-      dateTime: dateTime,
-      minEndTime: minEndTimeStr,
-      newEndTime: newEndTime
+    // 格式化日期时间
+    const formattedTime = this.formatDateTime(date)
+    
+    // 更新页面数据
+    this.setData({
+      dateTime: date,
+      formattedTime: formattedTime
     })
     
-    this.setData({
-      dateTime: dateTime,
-      formattedTime: this.formatDateTime(dateTime),
-      endDateTime: newEndTime,
-      formattedEndTime: this.formatDateTime(newEndTime),
-      minEndTime: minEndTimeStr
-    })
+    console.log('设置开始时间:', formattedTime)
     this.checkCanSubmit()
   },
 
-  onEndTimeChange: function (e) {
-    console.log('结束时间选择器被触发:', e.detail.value)
-    const endDateTime = e.detail.value
+  // 处理结束时间输入
+  onEndTimeInput: function (e) {
+    console.log('结束时间输入:', e.detail.value)
+    
+    const timeValue = e.detail.value
+    if (!timeValue) {
+      console.log('时间值为空，返回')
+      return
+    }
+    
+    // 解析时间值
+    const date = new Date(timeValue)
+    if (isNaN(date.getTime())) {
+      console.log('无效的日期时间值:', timeValue)
+      return
+    }
+    
+    // 确保结束时间不早于开始时间
+    if (this.data.dateTime) {
+      const startTime = new Date(this.data.dateTime)
+      if (date <= startTime) {
+        wx.showToast({
+          title: '结束时间不能早于开始时间',
+          icon: 'none'
+        })
+        return
+      }
+    }
+    
+    // 格式化日期时间
+    const formattedEndTime = this.formatDateTime(date)
+    
+    // 更新页面数据
     this.setData({
-      endDateTime: endDateTime,
-      formattedEndTime: this.formatDateTime(endDateTime)
+      endDateTime: date,
+      formattedEndTime: formattedEndTime
     })
+    
+    console.log('设置结束时间:', formattedEndTime)
     this.checkCanSubmit()
   },
 
@@ -268,9 +477,101 @@ Page({
           activityImage: tempFilePaths[0],
           activityImageUrl: tempFilePaths[0]
         })
+        
+        // 上传图片到服务器
+        this.uploadImage(tempFilePaths[0])
         this.checkCanSubmit()
       }
     })
+  },
+
+  // 上传图片到服务器
+  uploadImage: function(filePath) {
+    const app = getApp();
+    console.log('上传图片，使用的token:', app.globalData.token);
+    console.log('上传的文件路径:', filePath);
+    
+    wx.showLoading({
+      title: '上传图片中...'
+    });
+
+    wx.uploadFile({
+      url: 'http://localhost:5000/api/upload/image',
+      filePath: filePath,
+      name: 'file',
+      header: {
+        'Authorization': `Bearer ${app.globalData.token}`
+      },
+      success: (res) => {
+        wx.hideLoading();
+        console.log('图片上传成功，状态码:', res.statusCode);
+        console.log('响应数据类型:', typeof res.data);
+        console.log('响应数据:', res.data);
+        
+        if (res.statusCode === 200 || res.statusCode === 201) {
+          let data;
+          try {
+            if (typeof res.data === 'string') {
+              data = JSON.parse(res.data);
+            } else {
+              data = res.data;
+            }
+          } catch (e) {
+            console.error('解析响应数据失败:', e);
+            data = res.data;
+          }
+          
+          console.log('解析后的数据:', data);
+          
+          // 处理不同的响应格式
+          let imageUrl = null;
+          if (data && data.data) {
+            // 格式1: {data: {url: "..."}}
+            imageUrl = data.data.url || data.data.image_url || data.data.image;
+          } else if (data && (data.url || data.image_url || data.image)) {
+            // 格式2: {url: "..."}
+            imageUrl = data.url || data.image_url || data.image;
+          }
+          
+          // 如果图片URL是相对路径，转换为完整URL
+          if (imageUrl && imageUrl.startsWith('/')) {
+            imageUrl = 'http://localhost:5000' + imageUrl;
+          }
+          
+          if (imageUrl) {
+            console.log('使用的图片URL:', imageUrl);
+            this.setData({
+              activityImage: imageUrl,
+              activityImageUrl: imageUrl
+            });
+            wx.showToast({
+              title: '图片上传成功',
+              icon: 'success'
+            });
+          } else {
+            console.error('响应数据中没有图片URL，数据:', data);
+            wx.showToast({
+              title: '图片上传失败',
+              icon: 'none'
+            });
+          }
+        } else {
+          console.error('上传失败，状态码:', res.statusCode);
+          wx.showToast({
+            title: '图片上传失败',
+            icon: 'none'
+          });
+        }
+      },
+      fail: (err) => {
+        wx.hideLoading();
+        console.error('图片上传失败:', err);
+        wx.showToast({
+          title: '图片上传失败',
+          icon: 'none'
+        });
+      }
+    });
   },
 
   // 标签选择
@@ -348,7 +649,7 @@ Page({
       return
     }
     
-    if (!this.data.dateTime) {
+    if (!this.data.startDate || !this.data.startTime) {
       wx.showToast({
         title: '请选择活动开始时间',
         icon: 'none'
@@ -356,7 +657,7 @@ Page({
       return
     }
     
-    if (!this.data.endDateTime) {
+    if (!this.data.endDate || !this.data.endTime) {
       wx.showToast({
         title: '请选择活动结束时间',
         icon: 'none'
@@ -365,7 +666,9 @@ Page({
     }
     
     // 验证结束时间必须晚于开始时间
-    if (new Date(this.data.endDateTime) <= new Date(this.data.dateTime)) {
+    const startDateTime = new Date(this.data.startDate + ' ' + this.data.startTime)
+    const endDateTime = new Date(this.data.endDate + ' ' + this.data.endTime)
+    if (endDateTime <= startDateTime) {
       wx.showToast({
         title: '结束时间必须晚于开始时间',
         icon: 'none'
@@ -418,22 +721,22 @@ Page({
       // 确保基本字段存在且格式正确
       type: this.data.activityType,
       title: this.data.title,
-      start_time: formatDateTimeForBackend(this.data.dateTime), // 确保日期时间格式包含秒信息
-      end_time: formatDateTimeForBackend(this.data.endDateTime), // 确保日期时间格式包含秒信息
+      start_time: this.formatDateTimeForBackend(this.data.startDate, this.data.startTime),
+      end_time: this.formatDateTimeForBackend(this.data.endDate, this.data.endTime),
       location: this.data.location,
-      current_people: parseInt(this.data.currentPeople), // 后端期望的字段名可能是current_people（下划线分隔）
-      max_participants: parseInt(this.data.totalPeople), // 后端期望的字段名是max_participants（总人数）
-      price: parseFloat(this.data.price) || 0, // 确保是数字类型
+      current_people: String(this.data.currentPeople), // 后端期望字符串
+      max_participants: String(this.data.totalPeople), // 后端期望字符串
+      price: String(parseFloat(this.data.price) || 0), // 确保是字符串类型
       description: this.data.description || '',
       tags: this.data.selectedTags || [],
-      box_type: this.data.boxType, // 后端期望的字段名可能是box_type（下划线分隔）
+      box_type: this.data.boxType,
       // 活动图片
       image: this.data.activityImage || '',
       // 添加活动规则相关字段
-      registration_deadline: parseInt(this.data.registrationDeadline) || 2, // 报名截止时间（活动开始前2小时）
-      deposit_rule: parseInt(this.data.depositRule) || 1, // 押金规则（活动开始前1小时不取消押金不退）
-      has_deposit: this.data.hasDeposit, // 后端期望的字段名可能是has_deposit（下划线分隔）
-      deposit_amount: parseFloat(this.data.depositAmount) || 0, // 后端期望的字段名可能是deposit_amount（下划线分隔）
+      registration_deadline: String(parseInt(this.data.registrationDeadline) || 2), // 后端期望字符串
+      deposit_rule: String(parseInt(this.data.depositRule) || 1), // 后端期望字符串
+      has_deposit: this.data.hasDeposit,
+      deposit_amount: String(parseFloat(this.data.depositAmount) || 0), // 后端期望字符串
       // 移除可能不被后端接受的字段
       // createTime: new Date().toISOString(), // 后端可能自己生成
       // creatorRole: this.data.userRole // 后端从token中获取角色

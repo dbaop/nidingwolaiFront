@@ -103,29 +103,105 @@
   margin-bottom: 15rpx;
 }
 
+.time-picker-row {
+  display: flex;
+  gap: 0;
+  border: 2rpx solid #FF6B8B;
+  border-radius: 12rpx;
+  overflow: hidden;
+}
+
+.time-picker-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20rpx;
+  font-size: 36rpx;
+  background-color: #FF6B8B;
+  color: #ffffff;
+  border-radius: 12rpx 0 0 12rpx;
+}
+
+.time-picker-row picker {
+  flex: 1;
+}
+
+.time-picker-row picker:last-child .time-picker-display {
+  border-radius: 0 12rpx 12rpx 0;
+}
+
 .time-picker-display {
   width: 100%;
   min-height: 80rpx;
   background-color: #ffffff;
-  border: 2rpx solid #FF6B8B;
-  border-radius: 12rpx;
   color: #333333;
   display: flex;
   align-items: center;
+  justify-content: center;
   padding: 20rpx 24rpx;
   font-size: 30rpx;
-  transition: all 0.3s ease;
   box-sizing: border-box;
-  cursor: pointer;
+  border: none;
 }
 
 .time-picker-display:active {
   background-color: #fff5f5;
-  border-color: #FF5A7F;
 }
 
-/* 确保picker组件可以被点击 */
-.time-picker-container picker {
+/* 时间输入框样式 */
+.time-input-wrapper {
+  position: relative;
+  width: 100%;
+  height: 80rpx;
+}
+
+.time-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.time-input-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 24rpx;
+  font-size: 30rpx;
+  color: #999999;
+  background-color: #ffffff;
+  border: 2rpx solid #FF6B8B;
+  border-radius: 12rpx;
+  box-sizing: border-box;
+}
+
+.time-input-value {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 24rpx;
+  font-size: 30rpx;
+  color: #333333;
+  background-color: #ffffff;
+  border: 2rpx solid #FF6B8B;
+  border-radius: 12rpx;
+  box-sizing: border-box;
+}
+
+/* 原生picker组件的样式 */
+.time-picker-native {
   display: block;
   width: 100%;
   position: relative;
@@ -338,11 +414,21 @@
 }
 
 /* 价格提示 */
+.price-row {
+  display: flex;
+  gap: 20rpx;
+  align-items: center;
+}
+
+.price-input {
+  flex: 1;
+}
+
 .price-hint {
   display: block;
   font-size: 24rpx;
   color: #999999;
-  margin-top: 10rpx;
+  white-space: nowrap;
 }
 
 /* 文本域 */

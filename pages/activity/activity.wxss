@@ -181,3 +181,43 @@
   font-size: 28rpx;
   color: #999;
 }
+
+/* 活动操作按钮 */
+.activity-actions {
+  padding: 20rpx;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-cancel {
+  background-color: #ff4d4f;
+  color: #ffffff;
+  border: none;
+  border-radius: 8rpx;
+  padding: 16rpx 32rpx;
+  font-size: 26rpx;
+  line-height: 1.2;
+}
+
+.btn-cancel:active {
+  background-color: #e64547;
+}
+
+/* 迷你取消按钮 */
+.btn-cancel-mini {
+  background-color: #ff4d4f;
+  color: #ffffff;
+  border: none;
+  border-radius: 4rpx;
+  padding: 4rpx 4rpx;
+  font-size: 22rpx;
+  line-height: 1.2;
+  margin-left: 10rpx;
+  white-space: nowrap;
+  display: inline-block;
+  min-width: auto;
+}
+
+.btn-cancel-mini:active {
+  background-color: #e64547;
+}

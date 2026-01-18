@@ -162,6 +162,12 @@ App({
                 wx.setStorageSync('userRole', res.data.role || 'user');
                 wx.setStorageSync('token', res.data.token); // 保存JWT令牌
                 
+                // 同时保存到globalData中
+                this.globalData.token = res.data.token;
+                this.globalData.userInfo = userRes.userInfo;
+                this.globalData.isLogin = true;
+                this.globalData.userRole = res.data.role || 'user';
+                
                 // 调用回调
                 if (callback) callback(userRes.userInfo);
               });
@@ -211,6 +217,12 @@ App({
       wx.setStorageSync('isLogin', true);
       wx.setStorageSync('userRole', res.data.role || 'user');
       wx.setStorageSync('token', res.data.access_token || res.data.token); // 保存JWT令牌
+      
+      // 同时保存到globalData中
+      this.globalData.token = res.data.access_token || res.data.token;
+      this.globalData.userInfo = userInfo;
+      this.globalData.isLogin = true;
+      this.globalData.userRole = res.data.role || 'user';
       
       // 调用回调
       callback({ success: true });
@@ -283,6 +295,11 @@ App({
     
     // 获取token
     const token = wx.getStorageSync('token');
+    console.log('请求URL:', url);
+    console.log('使用的token:', token ? '存在' : '不存在');
+    if (token) {
+      console.log('token长度:', token.length);
+    }
     
     // 构造请求参数
     const requestOptions = {
@@ -295,7 +312,7 @@ App({
       },
       success: res => {
         // 处理响应
-        if (res.statusCode === 200) {
+        if (res.statusCode === 200 || res.statusCode === 201) {
           callback(null, res.data);
         } else {
           // 打印详细错误信息

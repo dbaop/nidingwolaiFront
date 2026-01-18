@@ -9,7 +9,8 @@
     "pages/profile/edit/edit",
     "pages/merchant/apply/apply",
     "pages/merchant/manage/manage",
-    "pages/merchant/review/review"
+    "pages/merchant/review/review",
+    "pages/time-picker/time-picker"
   ],
   "window": {
     "backgroundTextStyle": "light",

@@ -54,9 +54,9 @@
 
       <!-- 我创建的活动 -->
       <view wx:if="{{activeTab === 'created'}}" class="tab-content">
-        <view class="activity-card" wx:for="{{createdActivities}}" wx:key="id" bindtap="goToActivityDetail" data-id="{{item.id}}">
-          <image class="activity-image" src="{{item.image}}"></image>
-          <view class="activity-info">
+        <view class="activity-card" wx:for="{{createdActivities}}" wx:key="id">
+          <image class="activity-image" src="{{item.image}}" bindtap="goToActivityDetail" data-id="{{item.id}}"></image>
+          <view class="activity-info" bindtap="goToActivityDetail" data-id="{{item.id}}">
             <view class="activity-title">{{item.title}}</view>
             <view class="activity-meta">
               <text class="time">{{item.time}}</text>
@@ -67,6 +67,7 @@
                 {{item.status === 'upcoming' ? '即将开始' : item.status === 'ongoing' ? '进行中' : '已结束'}}
               </view>
               <text class="people">{{item.currentPeople}}/{{item.totalPeople}}人</text>
+              <button class="btn-cancel-mini" catchtap="cancelActivity" data-id="{{item.id}}">取消</button>
             </view>
           </view>
         </view>

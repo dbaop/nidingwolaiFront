@@ -1,6 +1,6 @@
 <!-- 创建活动页 -->
 <view class="container">
-  <form bindsubmit="onFormSubmit" catchsubmit="onFormSubmit">
+  <form bindsubmit="onFormSubmit">
     <!-- 活动类型 -->
     <view class="form-section">
       <text class="section-title">活动类型</text>
@@ -40,20 +40,36 @@
       
       <view class="time-picker-container">
         <text class="time-label">开始时间</text>
-        <picker mode="datetime" bindchange="onTimeChange" value="{{dateTime}}">
-          <view class="time-picker-display">
-            {{formattedTime || '请选择活动开始时间'}}
-          </view>
-        </picker>
+        <view class="time-picker-row">
+          <view class="time-picker-icon">📅</view>
+          <picker mode="date" bindchange="onStartDateChange" value="{{startDate}}">
+            <view class="time-picker-display">
+              {{startDate || '选择日期'}}
+            </view>
+          </picker>
+          <picker mode="time" bindchange="onStartTimeChange" value="{{startTime}}">
+            <view class="time-picker-display">
+              {{startTime || '选择时间'}}
+            </view>
+          </picker>
+        </view>
       </view>
       
       <view class="time-picker-container">
         <text class="time-label">结束时间</text>
-        <picker mode="datetime" bindchange="onEndTimeChange" value="{{endDateTime}}" start="{{minEndTime}}">
-          <view class="time-picker-display">
-            {{formattedEndTime || '请选择活动结束时间'}}
-          </view>
-        </picker>
+        <view class="time-picker-row">
+          <view class="time-picker-icon">📅</view>
+          <picker mode="date" bindchange="onEndDateChange" value="{{endDate}}">
+            <view class="time-picker-display">
+              {{endDate || '选择日期'}}
+            </view>
+          </picker>
+          <picker mode="time" bindchange="onEndTimeChange" value="{{endTime}}">
+            <view class="time-picker-display">
+              {{endTime || '选择时间'}}
+            </view>
+          </picker>
+        </view>
       </view>
     </view>
 
@@ -161,8 +177,10 @@
     <!-- 费用说明 -->
     <view class="form-section">
       <text class="section-title">费用说明</text>
-      <input class="form-input" name="price" type="number" placeholder="请输入人均费用（元）" bindinput="onPriceInput" value="{{price}}" />
-      <text class="price-hint">* 填写人均费用，活动结束后将按此金额AA</text>
+      <view class="price-row">
+        <input class="form-input price-input" name="price" type="number" placeholder="请输入人均费用（元）" bindinput="onPriceInput" value="{{price}}" />
+        <text class="price-hint">* 填写人均费用，活动结束后将按此金额AA</text>
+      </view>
     </view>
 
     <!-- 活动规则 -->
