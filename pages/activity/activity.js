@@ -294,6 +294,15 @@ Page({
     })
   },
 
+  // 前往报名管理页面
+  goToEnrollmentManage: function(e) {
+    const activityId = e.currentTarget.dataset.id;
+    const activityTitle = e.currentTarget.dataset.title;
+    wx.navigateTo({
+      url: `/pages/enrollment-manage/enrollment-manage?activityId=${activityId}&activityTitle=${activityTitle}`
+    });
+  },
+
   // 取消活动
   cancelActivity: function(e) {
     const id = e.currentTarget.dataset.id;

@@ -12,7 +12,7 @@
   padding: 30rpx;
   margin-bottom: 20rpx;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
   min-height: 200rpx;
 }
@@ -20,18 +20,17 @@
 .avatar-container {
   position: relative;
   margin-right: 30rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-shrink: 0;
 }
 
 .avatar {
-  width: 140rpx;
-  height: 140rpx;
+  width: 160rpx;
+  height: 160rpx;
   border-radius: 50%;
   object-fit: cover;
   border: 4rpx solid #f86b5f;
   background-color: #f5f5f5;
+  display: block;
 }
 
 /* 未登录状态时的头像样式 */
@@ -72,7 +71,8 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  padding-left: 10rpx;
+  padding-left: 0;
+  min-height: 160rpx;
 }
 
 .user-header {
@@ -80,28 +80,33 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 20rpx;
+  min-height: 50rpx;
 }
 
 .nickname {
   font-size: 36rpx;
   font-weight: 600;
   color: #333333;
+  line-height: 50rpx;
 }
 
 .user-stats {
   display: flex;
-  height: 80rpx;
+  height: 100rpx;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
+  padding: 0;
+  gap: 30rpx;
 }
 
 .stat-item {
-  flex: 1;
-  text-align: center;
+  flex: 0;
+  text-align: left;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
+  min-width: 80rpx;
 }
 
 .stat-number {
@@ -110,12 +115,14 @@
   font-weight: 500;
   color: #f86b5f;
   margin-bottom: 4rpx;
+  line-height: 1.2;
 }
 
 .stat-label {
   display: block;
   font-size: 22rpx;
   color: #666666;
+  line-height: 1.2;
 }
 
 /* 登录提示区域 */
@@ -124,29 +131,27 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: flex-start; /* 改为左对齐 */
-  height: 140rpx; /* 与user-stats高度保持一致 */
+  align-items: flex-start;
+  height: 100rpx;
   padding: 0;
-  gap: 20rpx; /* 使用gap来控制间距，确保垂直对齐 */
-  padding-left: 20rpx; /* 添加左边距，与统计项对齐 */
 }
 
 .prompt-text {
-  font-size: 28rpx;
+  font-size: 26rpx;
   color: #999999;
-  text-align: left; /* 改为左对齐 */
+  text-align: left;
   line-height: 1.4;
-  margin: 0; /* 移除margin，使用gap控制间距 */
-  flex-shrink: 0; /* 防止文本被压缩 */
+  margin-bottom: 14rpx;
+  padding-left: 0;
 }
 
 .login-btn-prompt {
   background: linear-gradient(135deg, #FF6B8B 0%, #FF8E53 100%);
   color: #ffffff;
   border-radius: 25rpx;
-  height: 70rpx;
+  height: 60rpx;
   padding: 0 40rpx;
-  font-size: 28rpx;
+  font-size: 26rpx;
   font-weight: 500;
   display: flex;
   align-items: center;
@@ -154,9 +159,11 @@
   border: none;
   box-shadow: 0 4rpx 15rpx rgba(255, 107, 139, 0.3);
   transition: all 0.3s ease;
-  min-width: 200rpx;
-  margin: 0; /* 移除margin，使用gap控制间距 */
-  flex-shrink: 0; /* 防止按钮被压缩 */
+  min-width: 180rpx;
+  margin: 0;
+  padding-left: 0;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .login-btn-prompt:active {
@@ -165,7 +172,16 @@
 }
 
 .login-btn-prompt .btn-text {
-  margin-right: 8rpx;
+  margin-right: 6rpx;
+}
+
+.login-btn-prompt .btn-arrow {
+  font-size: 22rpx;
+  font-weight: bold;
+}
+
+.login-btn-prompt::after {
+  border: none;
 }
 
 .login-btn-prompt .btn-arrow {
@@ -181,8 +197,8 @@
   background-color: #f86b5f;
   color: #ffffff;
   border-radius: 8rpx;
-  padding: 6rpx 1rpx;
-  font-size: 26rpx;
+  padding: 8rpx 16rpx;
+  font-size: 24rpx;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -191,6 +207,11 @@
   box-sizing: border-box;
   position: relative;
   overflow: hidden;
+  min-width: auto !important;
+  flex-shrink: 0;
+  width: 80rpx !important;
+  height: 48rpx;
+  line-height: 48rpx;
 }
 
 .edit-btn::before {

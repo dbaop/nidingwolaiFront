@@ -1,0 +1,263 @@
+/* 报名管理页面样式 */
+.container {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  padding-bottom: 40rpx;
+}
+
+/* 页面标题 */
+.page-header {
+  background-color: #ffffff;
+  padding: 30rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+  margin-bottom: 20rpx;
+}
+
+.activity-title {
+  display: block;
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 10rpx;
+}
+
+.enrollment-count {
+  font-size: 26rpx;
+  color: #999999;
+}
+
+/* 筛选标签 */
+.filter-tabs {
+  display: flex;
+  background-color: #ffffff;
+  padding: 20rpx 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+  gap: 20rpx;
+  overflow-x: auto;
+}
+
+.filter-item {
+  flex-shrink: 0;
+  padding: 12rpx 24rpx;
+  border-radius: 30rpx;
+  font-size: 26rpx;
+  color: #666666;
+  background-color: #f5f5f5;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  transition: all 0.3s ease;
+}
+
+.filter-item.active {
+  background-color: #FF6B8B;
+  color: #ffffff;
+}
+
+.status-dot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  display: block;
+}
+
+.status-dot.pending {
+  background-color: #faad14;
+}
+
+.status-dot.approved {
+  background-color: #52c41a;
+}
+
+.status-dot.rejected {
+  background-color: #ff4d4f;
+}
+
+/* 报名列表 */
+.enrollment-list {
+  padding: 0 20rpx;
+}
+
+/* 报名卡片 */
+.enrollment-card {
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16rpx;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  margin-right: 20rpx;
+  border: 2rpx solid #f5f5f5;
+}
+
+.user-details {
+  flex: 1;
+}
+
+.username {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333333;
+  margin-bottom: 8rpx;
+}
+
+.enroll-time {
+  font-size: 24rpx;
+  color: #999999;
+}
+
+.status-badge {
+  padding: 8rpx 20rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  font-weight: 500;
+}
+
+.status-badge.pending {
+  background-color: #fff7e6;
+  color: #faad14;
+}
+
+.status-badge.approved {
+  background-color: #f6ffed;
+  color: #52c41a;
+}
+
+.status-badge.rejected {
+  background-color: #fff1f0;
+  color: #ff4d4f;
+}
+
+.card-message {
+  background-color: #f8f9fa;
+  padding: 16rpx;
+  border-radius: 8rpx;
+  margin-bottom: 16rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.message-label {
+  font-size: 24rpx;
+  color: #999999;
+}
+
+.message-content {
+  font-size: 28rpx;
+  color: #333333;
+  line-height: 1.6;
+}
+
+.card-actions {
+  display: flex;
+  gap: 16rpx;
+  padding-top: 16rpx;
+  border-top: 2rpx solid #f5f5f5;
+}
+
+.btn-reject,
+.btn-approve {
+  flex: 1;
+  height: 72rpx;
+  line-height: 72rpx;
+  border: none;
+  border-radius: 36rpx;
+  font-size: 28rpx;
+  font-weight: 500;
+}
+
+.btn-reject {
+  background-color: #f5f5f5;
+  color: #666666;
+}
+
+.btn-approve {
+  background: linear-gradient(135deg, #FF6B8B 0%, #FF8E53 100%);
+  color: #ffffff;
+}
+
+.btn-reject:active {
+  transform: scale(0.98);
+  background-color: #e8e8e8;
+}
+
+.btn-approve:active {
+  transform: scale(0.98);
+  box-shadow: 0 1rpx 4rpx rgba(255, 107, 139, 0.3);
+}
+
+.btn-reject::after,
+.btn-approve::after {
+  border: none;
+}
+
+/* 加载状态 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 0;
+}
+
+.loading-spinner {
+  width: 60rpx;
+  height: 60rpx;
+  border: 4rpx solid rgba(255, 107, 139, 0.2);
+  border-top: 4rpx solid #FF6B8B;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20rpx;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-container text {
+  font-size: 28rpx;
+  color: #999;
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 0;
+}
+
+.empty-state image {
+  width: 180rpx;
+  height: 180rpx;
+  margin-bottom: 30rpx;
+  opacity: 0.5;
+}
+
+.empty-state text {
+  font-size: 28rpx;
+  color: #999999;
+}

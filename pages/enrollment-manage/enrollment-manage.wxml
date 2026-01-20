@@ -1,0 +1,74 @@
+<!-- 报名管理页面 -->
+<view class="container">
+  <!-- 页面标题 -->
+  <view class="page-header">
+    <text class="activity-title">{{activityTitle}}</text>
+    <text class="enrollment-count">共 {{enrollments.length}} 人报名</text>
+  </view>
+
+  <!-- 筛选标签 -->
+  <view class="filter-tabs">
+    <view class="filter-item {{filterStatus === 'all' ? 'active' : ''}}" bindtap="switchFilter" data-status="all">
+      <text>全部</text>
+    </view>
+    <view class="filter-item {{filterStatus === 'pending' ? 'active' : ''}}" bindtap="switchFilter" data-status="pending">
+      <text class="status-dot pending"></text>
+      <text>待审批</text>
+    </view>
+    <view class="filter-item {{filterStatus === 'approved' ? 'active' : ''}}" bindtap="switchFilter" data-status="approved">
+      <text class="status-dot approved"></text>
+      <text>已同意</text>
+    </view>
+    <view class="filter-item {{filterStatus === 'rejected' ? 'active' : ''}}" bindtap="switchFilter" data-status="rejected">
+      <text class="status-dot rejected"></text>
+      <text>已拒绝</text>
+    </view>
+  </view>
+
+  <!-- 报名列表 -->
+  <view class="enrollment-list">
+    <!-- 加载状态 -->
+    <view wx:if="{{loading}}" class="loading-container">
+      <view class="loading-spinner"></view>
+      <text>加载中...</text>
+    </view>
+
+    <!-- 空状态 -->
+    <view wx:elif="{{filteredEnrollments.length === 0}}" class="empty-state">
+      <image src="/images/empty.png"></image>
+      <text>{{emptyMessage}}</text>
+    </view>
+
+    <!-- 报名卡片列表 -->
+    <view wx:else>
+      <view class="enrollment-card" wx:for="{{filteredEnrollments}}" wx:key="id">
+        <view class="card-header">
+          <view class="user-info">
+            <image class="avatar" src="{{item.user.avatar || '/images/avatar.png'}}" mode="aspectFill"></image>
+            <view class="user-details">
+              <text class="username">{{item.user.username}}</text>
+              <text class="enroll-time">报名时间: {{item.created_at}}</text>
+            </view>
+          </view>
+          <view class="status-badge {{item.status}}">
+            <text>{{item.statusText}}</text>
+          </view>
+        </view>
+
+        <view wx:if="{{item.message}}" class="card-message">
+          <text class="message-label">留言：</text>
+          <text class="message-content">{{item.message}}</text>
+        </view>
+
+        <view class="card-actions" wx:if="{{item.status === 'pending'}}">
+          <button class="btn-reject" catchtap="rejectEnrollment" data-id="{{item.id}}" data-username="{{item.user.username}}">
+            拒绝
+          </button>
+          <button class="btn-approve" catchtap="approveEnrollment" data-id="{{item.id}}" data-username="{{item.user.username}}">
+            同意
+          </button>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

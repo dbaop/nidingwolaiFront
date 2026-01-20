@@ -10,7 +10,8 @@
     "pages/merchant/apply/apply",
     "pages/merchant/manage/manage",
     "pages/merchant/review/review",
-    "pages/time-picker/time-picker"
+    "pages/time-picker/time-picker",
+    "pages/enrollment-manage/enrollment-manage"
   ],
   "window": {
     "backgroundTextStyle": "light",

@@ -1,10 +1,14 @@
 // 首页逻辑
 const imageHelper = require('../../utils/imageHelper.js');
+const { api } = require('../../utils/api.js');
 
 Page({
   data: {
     currentCategory: 'k歌',
     searchKeyword: '',
+    showJoinModal: false,
+    selectedActivity: {},
+    joinMessage: '',
     activities: [
       {
         id: 1,
@@ -142,12 +146,14 @@ Page({
     // 使用图片工具处理活动数据中的图片路径，启用Base64回退
     const processedActivities = imageHelper.processActivityImages(defaultActivities);
     
-    // 为每个活动添加带有Base64回退的图片URL
+    // 为每个活动添加带有Base64回退的图片URL和押金信息
     const activitiesWithFallback = processedActivities.map(activity => {
       return {
         ...activity,
         imageWithFallback: imageHelper.getImageUrlWithFallback(activity.image, true),
-        avatarsWithFallback: activity.avatars.map(avatar => imageHelper.getImageUrlWithFallback(avatar, true))
+        avatarsWithFallback: activity.avatars.map(avatar => imageHelper.getImageUrlWithFallback(avatar, true)),
+        deposit: Math.floor(activity.price * 0.3), // 押金为价格的30%
+        refundDays: 3 // 默认3天前可退款
       };
     });
     
@@ -194,6 +200,132 @@ Page({
       url: `/pages/activity/detail/detail?id=${activityId}`
     });
   },
+
+  // 显示报名对话框
+  showJoinDialog: function(e) {
+    const activityId = e.currentTarget.dataset.id;
+    const price = e.currentTarget.dataset.price;
+    const title = e.currentTarget.dataset.title;
+
+    // 查找活动详情
+    const activity = this.data.activities.find(item => item.id === activityId);
+
+    if (activity) {
+      this.setData({
+        showJoinModal: true,
+        selectedActivity: {
+          id: activity.id,
+          title: title,
+          time: activity.time,
+          location: activity.location,
+          price: price,
+          deposit: activity.deposit,
+          refundDays: activity.refundDays
+        },
+        joinMessage: ''
+      });
+    }
+  },
+
+  // 关闭报名对话框
+  closeJoinDialog: function() {
+    this.setData({
+      showJoinModal: false,
+      selectedActivity: {},
+      joinMessage: ''
+    });
+  },
+
+  // 输入报名留言
+  onMessageInput: function(e) {
+    this.setData({
+      joinMessage: e.detail.value
+    });
+  },
+
+  // 确认报名
+  confirmJoin: function() {
+    const activity = this.data.selectedActivity;
+    const message = this.data.joinMessage;
+
+    if (!activity.id) {
+      wx.showToast({
+        title: '活动信息错误',
+        icon: 'error'
+      });
+      return;
+    }
+
+    wx.showLoading({
+      title: '提交中...'
+    });
+
+    // 调用后端API提交报名申请
+    // 确保 activity_id 是整数类型
+    const enrollData = {
+      activity_id: parseInt(activity.id),
+      message: message
+    };
+
+    console.log('提交报名数据:', enrollData);
+    console.log('Token:', wx.getStorageSync('token'));
+
+    api.enroll(enrollData).then(res => {
+      wx.hideLoading();
+
+      wx.showToast({
+        title: '报名申请已提交，等待组织者审批',
+        icon: 'success',
+        duration: 2000
+      });
+
+      this.closeJoinDialog();
+
+      // 更新活动人数
+      const activities = this.data.activities.map(item => {
+        if (item.id === activity.id) {
+          return {
+            ...item,
+            currentPeople: item.currentPeople + 1
+          };
+        }
+        return item;
+      });
+
+      this.setData({
+        activities: activities
+      });
+    }).catch(err => {
+      wx.hideLoading();
+
+      console.error('报名失败:', err);
+
+      // 根据错误类型显示不同的提示
+      if (err.message && err.message.includes('未登录')) {
+        wx.showModal({
+          title: '提示',
+          content: '请先登录后再报名',
+          showCancel: false,
+          success: () => {
+            wx.navigateTo({
+              url: '/pages/login/login'
+            });
+          }
+        });
+      } else if (err.message && err.message.includes('已报名')) {
+        wx.showToast({
+          title: '您已经报名过此活动',
+          icon: 'none'
+        });
+      } else {
+        wx.showToast({
+          title: err.message || '报名失败，请稍后重试',
+          icon: 'none',
+          duration: 2000
+        });
+      }
+    });
+  }
 
 
 });

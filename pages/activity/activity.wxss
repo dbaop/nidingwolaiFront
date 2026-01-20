@@ -208,16 +208,41 @@
   background-color: #ff4d4f;
   color: #ffffff;
   border: none;
-  border-radius: 4rpx;
-  padding: 4rpx 4rpx;
-  font-size: 22rpx;
+  border-radius: 20rpx;
+  padding: 6rpx 10rpx;
+  font-size: 25rpx;
   line-height: 1.2;
-  margin-left: 10rpx;
+  margin-left: 5rpx;
   white-space: nowrap;
   display: inline-block;
-  min-width: auto;
+  min-width: auto !important; /* 强制覆盖最小宽度 */
+  width: 100rpx !important;    /* 强制固定宽度 */
+  box-sizing: border-box !important; /* 让width包含padding和border */
+  max-width: 100rpx !important; /* 限制最大宽度，防止被撑开 */
 }
 
 .btn-cancel-mini:active {
   background-color: #e64547;
+}
+
+/* 迷你管理按钮 */
+.btn-manage-mini {
+  background-color: #1890ff;
+  color: #ffffff;
+  border: none;
+  border-radius: 20rpx;
+  padding: 6rpx 10rpx;
+  font-size: 25rpx;
+  line-height: 1.2;
+  margin-left: 5rpx;
+  white-space: nowrap;
+  display: inline-block;
+  min-width: auto !important;
+  width: 100rpx !important;
+  box-sizing: border-box !important;
+  max-width: 100rpx !important;
+}
+
+.btn-manage-mini:active {
+  background-color: #096dd9;
 }

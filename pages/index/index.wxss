@@ -181,7 +181,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 10rpx;
-  margin-top: 15rpx;
+  flex: 1;
 }
 
 .tag {
@@ -190,6 +190,268 @@
   background-color: #FFF0F3;
   padding: 5rpx 15rpx;
   border-radius: 15rpx;
+}
+
+.activity-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 15rpx;
+  gap: 15rpx;
+}
+
+/* 申请加入按钮 */
+.join-btn {
+  background: linear-gradient(135deg, #FF6B8B 0%, #FF8E53 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  font-weight: 500;
+  padding: 8rpx 16rpx;
+  height: auto;
+  line-height: 1.5;
+  white-space: nowrap;
+  box-shadow: 0 2rpx 8rpx rgba(255, 107, 139, 0.3);
+  flex-shrink: 0;
+  min-width: auto !important;
+  width: auto !important;
+}
+
+.join-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 1rpx 4rpx rgba(255, 107, 139, 0.3);
+}
+
+.join-btn::after {
+  border: none;
+}
+
+/* 报名对话框样式 */
+.join-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  position: relative;
+  width: 85%;
+  max-height: 80vh;
+  background-color: #ffffff;
+  border-radius: 20rpx;
+  overflow: hidden;
+  animation: slideUp 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50rpx);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 2rpx solid #f5f5f5;
+}
+
+.modal-title {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #333333;
+}
+
+.close-icon {
+  font-size: 48rpx;
+  color: #999999;
+  font-weight: 300;
+  line-height: 1;
+  cursor: pointer;
+  padding: 5rpx;
+}
+
+.modal-body {
+  padding: 30rpx;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.activity-detail {
+  background-color: #f8f9fa;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.detail-title {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 15rpx;
+}
+
+.detail-row {
+  display: flex;
+  margin-bottom: 10rpx;
+}
+
+.detail-label {
+  font-size: 26rpx;
+  color: #666666;
+  min-width: 150rpx;
+}
+
+.detail-value {
+  font-size: 26rpx;
+  color: #333333;
+  flex: 1;
+}
+
+.deposit-info {
+  margin-bottom: 20rpx;
+}
+
+.deposit-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15rpx;
+  padding-bottom: 15rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.deposit-label {
+  font-size: 28rpx;
+  color: #666666;
+}
+
+.deposit-price {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #FF6B8B;
+}
+
+.deposit-tips {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15rpx;
+  padding: 15rpx;
+  background-color: #FFF7ED;
+  border-radius: 8rpx;
+}
+
+.tip-icon {
+  font-size: 28rpx;
+  margin-right: 10rpx;
+}
+
+.tip-text {
+  font-size: 24rpx;
+  color: #E65100;
+}
+
+.refund-rule {
+  padding: 15rpx;
+  background-color: #F3F4F6;
+  border-radius: 8rpx;
+}
+
+.rule-title {
+  display: block;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 8rpx;
+}
+
+.rule-text {
+  font-size: 24rpx;
+  color: #666666;
+  line-height: 1.6;
+}
+
+.message-input {
+  margin-top: 20rpx;
+}
+
+.message-textarea {
+  width: 100%;
+  min-height: 150rpx;
+  padding: 20rpx;
+  background-color: #f8f9fa;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  color: #333333;
+  box-sizing: border-box;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 20rpx;
+  padding: 20rpx 30rpx 30rpx;
+  border-top: 2rpx solid #f5f5f5;
+}
+
+.cancel-btn,
+.confirm-btn {
+  flex: 1;
+  height: 80rpx;
+  line-height: 80rpx;
+  border: none;
+  border-radius: 40rpx;
+  font-size: 30rpx;
+  font-weight: 500;
+}
+
+.cancel-btn {
+  background-color: #f5f5f5;
+  color: #666666;
+}
+
+.confirm-btn {
+  background: linear-gradient(135deg, #FF6B8B 0%, #FF8E53 100%);
+  color: #ffffff;
+}
+
+.cancel-btn::after,
+.confirm-btn::after {
+  border: none;
 }
 
 /* 加载状态样式 */

@@ -67,6 +67,7 @@
                 {{item.status === 'upcoming' ? '即将开始' : item.status === 'ongoing' ? '进行中' : '已结束'}}
               </view>
               <text class="people">{{item.currentPeople}}/{{item.totalPeople}}人</text>
+              <button class="btn-manage-mini" catchtap="goToEnrollmentManage" data-id="{{item.id}}" data-title="{{item.title}}">管理</button>
               <button class="btn-cancel-mini" catchtap="cancelActivity" data-id="{{item.id}}">取消</button>
             </view>
           </view>

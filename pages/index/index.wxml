@@ -78,11 +78,63 @@
                 <image class="avatar" wx:for="{{item.avatarsWithFallback}}" wx:for-item="avatar" wx:key="index" src="{{avatar}}"></image>
               </view>
             </view>
-            <view class="activity-tags">
-              <text class="tag" wx:for="{{item.tags}}" wx:key="index">{{item}}</text>
+            <view class="activity-footer">
+              <view class="activity-tags">
+                <text class="tag" wx:for="{{item.tags}}" wx:key="index">{{item}}</text>
+              </view>
+              <button class="join-btn" catchtap="showJoinDialog" data-id="{{item.id}}" data-price="{{item.price}}" data-title="{{item.title}}">
+                申请加入
+              </button>
             </view>
           </view>
         </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 报名确认对话框 -->
+  <view class="join-modal" wx:if="{{showJoinModal}}">
+    <view class="modal-mask" bindtap="closeJoinDialog"></view>
+    <view class="modal-content">
+      <view class="modal-header">
+        <text class="modal-title">申请加入活动</text>
+        <text class="close-icon" bindtap="closeJoinDialog">×</text>
+      </view>
+      <view class="modal-body">
+        <view class="activity-detail">
+          <text class="detail-title">{{selectedActivity.title}}</text>
+          <view class="detail-row">
+            <text class="detail-label">活动时间：</text>
+            <text class="detail-value">{{selectedActivity.time}}</text>
+          </view>
+          <view class="detail-row">
+            <text class="detail-label">活动地点：</text>
+            <text class="detail-value">{{selectedActivity.location}}</text>
+          </view>
+        </view>
+        
+        <view class="deposit-info">
+          <view class="deposit-row">
+            <text class="deposit-label">押金金额：</text>
+            <text class="deposit-price">¥{{selectedActivity.deposit || selectedActivity.price}}</text>
+          </view>
+          <view class="deposit-tips">
+            <text class="tip-icon">ℹ️</text>
+            <text class="tip-text">报名后押金将自动支付</text>
+          </view>
+          <view class="refund-rule">
+            <text class="rule-title">退款规则：</text>
+            <text class="rule-text">活动开始前{{selectedActivity.refundDays || 3}}天可申请退款，逾期不可退</text>
+          </view>
+        </view>
+
+        <view class="message-input">
+          <textarea class="message-textarea" placeholder="输入报名留言（选填）" bindinput="onMessageInput" value="{{joinMessage}}"></textarea>
+        </view>
+      </view>
+      <view class="modal-footer">
+        <button class="cancel-btn" bindtap="closeJoinDialog">取消</button>
+        <button class="confirm-btn" bindtap="confirmJoin">确认报名</button>
       </view>
     </view>
   </view>
