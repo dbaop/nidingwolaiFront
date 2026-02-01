@@ -101,11 +101,9 @@
       <view class="people-count">
         <view class="count-row">
           <view class="count-container">
-            <view class="count-info">
-              <text class="count-label">当前已有</text>
-              <text class="count-value">{{currentPeople}}</text>
-              <text class="count-unit">人</text>
-            </view>
+            <text class="count-label">当前已有</text>
+            <text class="count-value">{{currentPeople}}</text>
+            <text class="count-unit">人</text>
             <view class="count-control">
               <button class="count-btn" bindtap="decreaseCurrent" disabled="{{currentPeople <= 1}}">
                 <text class="btn-text">-</text>
@@ -116,11 +114,9 @@
             </view>
           </view>
           <view class="count-container">
-            <view class="count-info">
-              <text class="count-label">总共需要</text>
-              <text class="count-value">{{totalPeople}}</text>
-              <text class="count-unit">人</text>
-            </view>
+            <text class="count-label">总共需要</text>
+            <text class="count-value">{{totalPeople}}</text>
+            <text class="count-unit">人</text>
             <view class="count-control">
               <button class="count-btn" bindtap="decreaseTotal" disabled="{{totalPeople <= currentPeople}}">
                 <text class="btn-text">-</text>

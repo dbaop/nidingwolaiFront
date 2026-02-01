@@ -1,4 +1,6 @@
 // activity.js
+const { api } = require('../../utils/api.js');
+
 Page({
   data: {
     activeTab: 'joined',
@@ -11,6 +13,9 @@ Page({
   onLoad: function() {
     // 检查用户是否登录
     const app = getApp();
+    console.log('活动模块onLoad - 登录状态:', app.globalData.isLogin);
+    console.log('活动模块onLoad - 用户信息:', app.globalData.userInfo);
+
     if (!app.globalData.isLogin) {
       wx.showModal({
         title: '未登录',
@@ -24,14 +29,13 @@ Page({
       });
       return;
     }
+    console.log('活动模块 - 开始加载活动数据');
     this.loadAllActivities();
   },
 
   // 转换后端数据格式为前端格式
   transformActivityData: function(activity) {
-    console.log('转换活动数据:', activity);
-    
-    // 格式化时间（iOS兼容格式）
+    // 格式化时间
     let time = '';
     if (activity.start_time) {
       const startTime = new Date(activity.start_time);
@@ -40,7 +44,6 @@ Page({
       const day = startTime.getDate().toString().padStart(2, '0');
       const hour = startTime.getHours().toString().padStart(2, '0');
       const minute = startTime.getMinutes().toString().padStart(2, '0');
-      // 使用iOS兼容的格式：yyyy/MM/dd HH:mm
       time = `${year}/${month}/${day} ${hour}:${minute}`;
     }
 
@@ -56,59 +59,18 @@ Page({
       status = 'canceled';
     }
 
-    // 转换图片
-    let image = '../../images/karaoke.png';
-    console.log('处理图片，原始数据:', {
-      cover_image_url: activity.cover_image_url,
-      images: activity.images
-    });
-    
-    // 尝试从cover_image_url获取图片
-    if (activity.cover_image_url && activity.cover_image_url !== null) {
-      // 清理图片URL，移除可能的特殊字符
-      let imageUrl = activity.cover_image_url;
-      if (typeof imageUrl === 'string') {
-        imageUrl = imageUrl.trim().replace(/`/g, '').replace(/^`|`$/g, '');
-      }
-      console.log('清理后的图片URL:', imageUrl);
-      // 检查URL是否有效
-      if (imageUrl && imageUrl !== 'null' && imageUrl !== '' && !imageUrl.startsWith('http://tmp/')) {
-        image = imageUrl;
-        console.log('使用cover_image_url:', image);
-      } else {
-        console.log('图片URL无效，使用默认图片');
-      }
-    } 
-    // 尝试从images数组获取图片
-    else if (activity.images && Array.isArray(activity.images) && activity.images.length > 0) {
-      const firstImage = activity.images[0];
-      if (firstImage && typeof firstImage === 'string' && !firstImage.startsWith('http://tmp/')) {
-        image = firstImage;
-        console.log('使用images[0]:', image);
-      } else {
-        console.log('images[0]无效，使用默认图片');
-      }
-    } 
-    // 尝试从organizer.avatar获取图片
-    else if (activity.organizer && activity.organizer.avatar && activity.organizer.avatar !== null) {
-      let avatarUrl = activity.organizer.avatar;
-      if (typeof avatarUrl === 'string') {
-        avatarUrl = avatarUrl.trim().replace(/`/g, '').replace(/^`|`$/g, '');
-      }
-      console.log('清理后的头像URL:', avatarUrl);
-      if (avatarUrl && avatarUrl !== 'null' && avatarUrl !== '' && !avatarUrl.startsWith('http://tmp/')) {
-        image = avatarUrl;
-        console.log('使用organizer.avatar:', image);
-      } else {
-        console.log('头像URL无效，使用默认图片');
+    // 处理图片URL - 后端返回的是 cover_image_url 字段
+    let image = '/images/karaoke1.png';
+    const imageSource = activity.cover_image_url || activity.image; // 优先使用 cover_image_url
+    if (imageSource) {
+      if (imageSource.startsWith('http://') || imageSource.startsWith('https://')) {
+        image = imageSource;
+      } else if (imageSource.startsWith('/images/')) {
+        image = imageSource;
+      } else if (imageSource.startsWith('/uploads/')) {
+        image = 'http://localhost:5000' + imageSource;
       }
     }
-    // 使用默认图片
-    else {
-      console.log('没有有效的图片URL，使用默认图片');
-    }
-    
-    console.log('最终使用的图片:', image);
 
     const transformedData = {
       id: activity.id,
@@ -116,153 +78,117 @@ Page({
       time: time,
       location: activity.location || '未知地点',
       status: status,
-      currentPeople: activity.current_participants || 0,
-      totalPeople: activity.max_participants || 0,
+      currentPeople: activity.current_people || activity.current_participants || 0,
+      totalPeople: activity.total_people || activity.max_participants || 0,
       image: image
     };
-    
-    console.log('转换后的数据:', transformedData);
+
     return transformedData;
   },
 
   // 加载所有活动数据
   loadAllActivities: function() {
+    console.log('loadAllActivities - 开始执行');
     this.setData({ loading: true });
-    
-    // 并行加载各类活动数据
+
+    // 使用后端提供的专用接口并行获取三个分类的数据
+    console.log('loadAllActivities - 调用专用接口获取活动数据');
+
     Promise.all([
-      this.loadJoinedActivities(),
-      this.loadCreatedActivities(),
-      this.loadHistoryActivities()
-    ]).finally(() => {
-      this.setData({ loading: false });
-    });
-  },
+      api.getJoinedActivities().catch(err => {
+        console.error('获取已报名活动失败:', err);
+        return [];
+      }),
+      api.getCreatedActivities().catch(err => {
+        console.error('获取创建的活动失败:', err);
+        return [];
+      })
+    ]).then(([joinedData, createdData]) => {
+      console.log('获取已报名活动成功:', joinedData);
+      console.log('获取创建的活动成功:', createdData);
 
-  // 加载参与的活动
-  loadJoinedActivities: function() {
-    return new Promise((resolve) => {
-      const app = getApp();
-      app.request('/activities/joined', {}, 'GET', (err, res) => {
-        console.log('获取参与活动返回数据:', err, res);
-        if (!err && res && res.data && Array.isArray(res.data.activities)) {
-          // 转换数据格式
-          console.log('开始转换参与活动数据，数量:', res.data.activities.length);
-          const transformedActivities = res.data.activities.map(activity => this.transformActivityData(activity));
-          // 过滤掉已取消的活动
-          const filteredActivities = transformedActivities.filter(activity => activity.status !== 'canceled');
-          console.log('转换后的参与活动数据:', filteredActivities);
-          this.setData({ joinedActivities: filteredActivities });
-        } else if (!err && res && res.data && Array.isArray(res.data)) {
-          // 转换数据格式
-          console.log('开始转换参与活动数据（直接数组），数量:', res.data.length);
-          const transformedActivities = res.data.map(activity => this.transformActivityData(activity));
-          // 过滤掉已取消的活动
-          const filteredActivities = transformedActivities.filter(activity => activity.status !== 'canceled');
-          console.log('转换后的参与活动数据:', filteredActivities);
-          this.setData({ joinedActivities: filteredActivities });
+      // 解析已报名活动数据 - 处理嵌套的 data.activities 结构
+      let joinedActivities = [];
+      let joinedRawData = [];
+      if (Array.isArray(joinedData)) {
+        joinedRawData = joinedData;
+      } else if (joinedData.data && Array.isArray(joinedData.data)) {
+        joinedRawData = joinedData.data;
+      } else if (joinedData.data && joinedData.data.activities && Array.isArray(joinedData.data.activities)) {
+        joinedRawData = joinedData.data.activities;
+      } else if (joinedData.activities && Array.isArray(joinedData.activities)) {
+        joinedRawData = joinedData.activities;
+      }
+
+      console.log('已报名活动原始数据:', joinedRawData);
+      joinedActivities = joinedRawData.map(act => this.transformActivityData(act));
+
+      // 解析创建的活动数据 - 处理嵌套的 data.activities 结构
+      let createdActivities = [];
+      let historyActivities = [];
+      let allCreatedRawData = [];
+
+      if (Array.isArray(createdData)) {
+        allCreatedRawData = createdData;
+      } else if (createdData.data && Array.isArray(createdData.data)) {
+        allCreatedRawData = createdData.data;
+      } else if (createdData.data && createdData.data.activities && Array.isArray(createdData.data.activities)) {
+        allCreatedRawData = createdData.data.activities;
+      } else if (createdData.activities && Array.isArray(createdData.activities)) {
+        allCreatedRawData = createdData.activities;
+      }
+
+      console.log('创建的活动原始数据:', allCreatedRawData);
+
+      // 分类创建的活动：未完成的为"我创建的"，已完成的为"历史活动"
+      allCreatedRawData.forEach(activity => {
+        const transformed = this.transformActivityData(activity);
+        if (transformed.status === 'completed' || transformed.status === 'canceled') {
+          historyActivities.push(transformed);
         } else {
-          console.warn('获取参与活动失败或端点未实现，使用默认数据');
-          // 如果API调用失败或数据不是数组，使用默认示例数据
-          this.setData({ 
-            joinedActivities: [
-              {
-                id: 1,
-                title: '周末K歌聚会',
-                time: '周六 19:00',
-                location: 'KTV中心',
-                status: 'upcoming',
-                currentPeople: 3,
-                totalPeople: 6,
-                image: '../../images/karaoke.png'
-              }
-            ] 
-          });
+          createdActivities.push(transformed);
         }
-        resolve();
+      });
+
+      this.setData({
+        joinedActivities: joinedActivities,
+        createdActivities: createdActivities,
+        historyActivities: historyActivities,
+        loading: false
+      });
+
+      console.log('分类后的活动数据:', {
+        joined: joinedActivities.length,
+        created: createdActivities.length,
+        history: historyActivities.length
+      });
+
+      // 如果所有分类都是空的，显示提示
+      if (joinedActivities.length === 0 && createdActivities.length === 0 && historyActivities.length === 0) {
+        console.warn('所有活动分类都是空的');
+      }
+    }).catch(err => {
+      console.error('获取活动列表失败:', err);
+      console.error('错误详情:', err.message, err.statusCode);
+      // 使用默认数据
+      this.setData({
+        joinedActivities: [],
+        createdActivities: [],
+        historyActivities: [],
+        loading: false
       });
     });
   },
 
-  // 加载创建的活动
-  loadCreatedActivities: function() {
-    return new Promise((resolve) => {
-      const app = getApp();
-      app.request('/activities/created', {}, 'GET', (err, res) => {
-        console.log('获取创建活动返回数据:', err, res);
-        if (!err && res && res.data && Array.isArray(res.data.activities)) {
-          // 转换数据格式
-          const transformedActivities = res.data.activities.map(activity => this.transformActivityData(activity));
-          // 过滤掉已取消的活动
-          const filteredActivities = transformedActivities.filter(activity => activity.status !== 'canceled');
-          this.setData({ createdActivities: filteredActivities });
-        } else if (!err && res && res.data && Array.isArray(res.data)) {
-          // 转换数据格式
-          const transformedActivities = res.data.map(activity => this.transformActivityData(activity));
-          // 过滤掉已取消的活动
-          const filteredActivities = transformedActivities.filter(activity => activity.status !== 'canceled');
-          this.setData({ createdActivities: filteredActivities });
-        } else {
-          console.warn('获取创建活动失败或端点未实现，使用默认数据');
-          this.setData({ 
-            createdActivities: [
-              {
-                id: 2,
-                title: '桌游之夜',
-                time: '周五 20:00',
-                location: '桌游吧',
-                status: 'ongoing',
-                currentPeople: 4,
-                totalPeople: 8,
-                image: '../../images/boardgame.png'
-              }
-            ] 
-          });
-        }
-        resolve();
-      });
-    });
-  },
-
-  // 加载历史活动
-  loadHistoryActivities: function() {
-    return new Promise((resolve) => {
-      const app = getApp();
-      app.request('/activities/history', {}, 'GET', (err, res) => {
-        console.log('获取历史活动返回数据:', err, res);
-        if (!err && res && res.data && Array.isArray(res.data.activities)) {
-          // 转换数据格式
-          const transformedActivities = res.data.activities.map(activity => this.transformActivityData(activity));
-          // 过滤掉已取消的活动
-          const filteredActivities = transformedActivities.filter(activity => activity.status !== 'canceled');
-          this.setData({ historyActivities: filteredActivities });
-        } else if (!err && res && res.data && Array.isArray(res.data)) {
-          // 转换数据格式
-          const transformedActivities = res.data.map(activity => this.transformActivityData(activity));
-          // 过滤掉已取消的活动
-          const filteredActivities = transformedActivities.filter(activity => activity.status !== 'canceled');
-          this.setData({ historyActivities: filteredActivities });
-        } else {
-          console.warn('获取历史活动失败或端点未实现，使用默认数据');
-          // 如果返回的数据不是数组，使用默认示例数据
-          this.setData({ 
-            historyActivities: [
-              {
-                id: 3,
-                title: '爬山活动',
-                time: '上周日 08:00',
-                location: '西山公园',
-                status: 'completed',
-                currentPeople: 5,
-                totalPeople: 5,
-                image: '../../images/hiking.png'
-              }
-            ] 
-          });
-        }
-        resolve();
-      });
-    });
+  // 页面显示时刷新数据
+  onShow: function() {
+    // 检查用户是否登录
+    const app = getApp();
+    if (!app.globalData.isLogin) {
+      return;
+    }
+    // 刷新活动列表
+    this.loadAllActivities();
   },
 
   // 下拉刷新

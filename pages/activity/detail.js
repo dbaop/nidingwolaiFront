@@ -37,8 +37,22 @@ Page({
       this.setData({ loading: false });
       
       if (!err && res && res.data) {
-        this.setData({ activity: res.data });
-        this.checkUserJoined();
+        const activity = res.data;
+        // 确保数字字段有默认值
+        activity.current_participants = activity.current_participants || 0;
+        activity.max_participants = activity.max_participants || 0;
+        activity.deposit_amount = activity.deposit_amount || 0;
+        activity.estimated_cost_per_person = activity.estimated_cost_per_person || 0;
+        
+        // 从活动详情获取报名状态
+        const hasJoined = activity.is_enrolled || false;
+        const enrollmentStatus = activity.enrollment_status || null;
+        
+        this.setData({ 
+          activity: activity,
+          hasJoined: hasJoined,
+          enrollmentStatus: enrollmentStatus
+        });
       } else {
         wx.showToast({
           title: '加载活动失败',
@@ -56,22 +70,6 @@ Page({
     const app = getApp();
     this.setData({
       userRole: app.globalData.userRole || 'user'
-    });
-  },
-
-  // 检查用户是否已加入活动
-  checkUserJoined: function() {
-    const app = getApp();
-    app.request(`/enrollments/my?status=pending,approved,attended&activity_id=${this.data.activityId}`, {}, 'GET', (err, res) => {
-      if (!err && res && res.data && res.data.enrollments) {
-        const enrollments = res.data.enrollments;
-        if (enrollments.length > 0) {
-          this.setData({
-            hasJoined: true,
-            enrollmentStatus: enrollments[0].status
-          });
-        }
-      }
     });
   },
 
@@ -152,10 +150,38 @@ Page({
         setTimeout(() => {
           this.loadActivityDetail();
         }, 1000);
+      } else if (err && err.message && err.message.includes('登录已过期')) {
+        // Token过期，跳转到登录页
+        wx.showModal({
+          title: '提示',
+          content: '登录已过期，请重新登录',
+          showCancel: false,
+          success: () => {
+            wx.navigateTo({
+              url: '/pages/login/login'
+            });
+          }
+        });
+      } else if (res && res.statusCode === 400 && (res.data && res.data.message && res.data.message.includes('already enrolled'))) {
+        // 已经报名过，更新状态
+        this.setData({
+          hasJoined: true,
+          enrollmentStatus: 'approved'
+        });
+        
+        wx.showToast({
+          title: '您已报名该活动',
+          icon: 'none'
+        });
+        
+        // 刷新活动详情
+        setTimeout(() => {
+          this.loadActivityDetail();
+        }, 500);
       } else {
         // 报名失败
         wx.showToast({
-          title: res && res.message || '申请失败，请重试',
+          title: res && res.data && res.data.message || err && err.message || '申请失败，请重试',
           icon: 'none'
         });
       }

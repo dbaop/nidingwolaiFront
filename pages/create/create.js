@@ -1,4 +1,6 @@
 // create.js
+const { api } = require('../../utils/api.js');
+
 Page({
   data: {
     // 活动类型
@@ -206,40 +208,36 @@ Page({
   // 更新格式化的开始时间
   updateFormattedTime: function () {
     if (this.data.startDate && this.data.startTime) {
-      // 格式化日期：2026-01-18
-      const dateParts = this.data.startDate.split('-')
-      const formattedDate = `${dateParts[0]}年${dateParts[1]}月${dateParts[2]}日`
-      
-      // 格式化时间：14:30
-      const timeParts = this.data.startTime.split(':')
-      const formattedTime = `${timeParts[0]}:${timeParts[1]}`
-      
-      const formattedTimeStr = `${formattedDate} ${formattedTime}`
+      // 使用ISO格式兼容iOS：2026-01-18T14:30
+      const dateTimeStr = this.data.startDate + 'T' + this.data.startTime
+      const startDateTime = new Date(dateTimeStr)
+
+      // 格式化日期用于显示
+      const formattedDate = `${startDateTime.getFullYear()}年${startDateTime.getMonth() + 1}月${startDateTime.getDate()}日`
+      const formattedTime = `${String(startDateTime.getHours()).padStart(2, '0')}:${String(startDateTime.getMinutes()).padStart(2, '0')}`
+
       this.setData({
-        formattedTime: formattedTimeStr
+        formattedTime: formattedDate + ' ' + formattedTime
       })
-      
+
       // 自动设置结束时间（开始时间加1小时）
-      const startDateTime = new Date(this.data.startDate + ' ' + this.data.startTime)
       const endDateTime = new Date(startDateTime.getTime() + 60 * 60 * 1000)
-      const endDate = endDateTime.getFullYear() + '-' + 
-                    String(endDateTime.getMonth() + 1).padStart(2, '0') + '-' + 
+      const endDate = endDateTime.getFullYear() + '-' +
+                    String(endDateTime.getMonth() + 1).padStart(2, '0') + '-' +
                     String(endDateTime.getDate()).padStart(2, '0')
-      const endTime = String(endDateTime.getHours()).padStart(2, '0') + ':' + 
+      const endTime = String(endDateTime.getHours()).padStart(2, '0') + ':' +
                     String(endDateTime.getMinutes()).padStart(2, '0')
-      
-      // 格式化结束时间
-      const endParts = endDate.split('-')
-      const formattedEndDate = `${endParts[0]}年${endParts[1]}月${endParts[2]}日`
-      const endTimeParts = endTime.split(':')
-      const formattedEndTime = `${endTimeParts[0]}:${endTimeParts[1]}`
-      
+
+      // 格式化结束时间用于显示
+      const formattedEndDate = `${endDateTime.getFullYear()}年${endDateTime.getMonth() + 1}月${endDateTime.getDate()}日`
+      const formattedEndTime = `${String(endDateTime.getHours()).padStart(2, '0')}:${String(endDateTime.getMinutes()).padStart(2, '0')}`
+
       this.setData({
         endDate: endDate,
         endTime: endTime,
-        formattedEndTime: `${formattedEndDate} ${formattedEndTime}`
+        formattedEndTime: formattedEndDate + ' ' + formattedEndTime
       })
-      
+
       this.checkCanSubmit()
     }
   },
@@ -487,9 +485,25 @@ Page({
 
   // 上传图片到服务器
   uploadImage: function(filePath) {
-    const app = getApp();
-    console.log('上传图片，使用的token:', app.globalData.token);
+    const token = wx.getStorageSync('token');
+    console.log('上传图片，使用的token:', token);
+    console.log('token是否有效:', token && token.length > 20 ? '是' : '否');
     console.log('上传的文件路径:', filePath);
+
+    // 检查token是否存在且有效
+    if (!token || token.length < 20) {
+      wx.hideLoading();
+      console.error('Token无效或不存在');
+      wx.showModal({
+        title: '登录已过期',
+        content: '请重新登录后再试',
+        showCancel: false,
+        success: () => {
+          wx.navigateBack();
+        }
+      });
+      return;
+    }
     
     wx.showLoading({
       title: '上传图片中...'
@@ -500,7 +514,7 @@ Page({
       filePath: filePath,
       name: 'file',
       header: {
-        'Authorization': `Bearer ${app.globalData.token}`
+        'Authorization': `Bearer ${token}`
       },
       success: (res) => {
         wx.hideLoading();
@@ -743,28 +757,42 @@ Page({
     }
     
     console.log('调整后表单数据:', formData)
-    
-    // 获取应用实例
-    const app = getApp();
-    
+
+    wx.showLoading({
+      title: '创建中...'
+    })
+
     // 调用后端API提交数据
-    app.request('/activities/', formData, 'POST', (err) => {
-      if (err) {
-        wx.showToast({
-          title: '创建失败，请重试',
-          icon: 'none'
-        })
-        return
-      }
-      
+    api.createActivity(formData).then(res => {
+      wx.hideLoading()
+      console.log('活动创建成功:', res)
+
       wx.showToast({
-        title: '活动创建成功'
+        title: '活动创建成功',
+        icon: 'success'
       })
-      
-      // 返回首页
+
+      // 返回首页并刷新数据
       setTimeout(() => {
+        const pages = getCurrentPages()
+        const prevPage = pages[pages.length - 2] // 获取上一个页面（首页）
+
+        if (prevPage && prevPage.route === 'pages/index/index') {
+          // 如果上一个页面是首页，重新加载活动数据
+          console.log('刷新首页活动列表')
+          prevPage.loadActivities()
+        }
+
         wx.navigateBack()
       }, 1500)
+    }).catch(err => {
+      wx.hideLoading()
+      console.error('活动创建失败:', err)
+
+      wx.showToast({
+        title: err.message || '创建失败，请重试',
+        icon: 'none'
+      })
     })
   }
 })

@@ -32,8 +32,22 @@ Page({
     api.getEnrollments(this.data.activityId).then(res => {
       wx.hideLoading();
 
+      // 处理返回的数据格式
+      let enrollmentsData = [];
+      if (Array.isArray(res)) {
+        enrollmentsData = res;
+      } else if (res.data && Array.isArray(res.data)) {
+        enrollmentsData = res.data;
+      } else if (res.data && res.data.enrollments && Array.isArray(res.data.enrollments)) {
+        enrollmentsData = res.data.enrollments;
+      } else if (res.enrollments && Array.isArray(res.enrollments)) {
+        enrollmentsData = res.enrollments;
+      }
+
+      console.log('报名列表数据:', enrollmentsData);
+
       // 格式化报名数据
-      const formattedEnrollments = res.map(item => {
+      const formattedEnrollments = enrollmentsData.map(item => {
         return {
           ...item,
           statusText: this.getStatusText(item.status),

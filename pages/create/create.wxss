@@ -250,7 +250,9 @@
 .count-container {
   flex: 1;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
   gap: 15rpx;
   background-color: #f9f9f9;
   padding: 20rpx;
@@ -261,7 +263,6 @@
 .count-info {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 10rpx;
 }
 
@@ -279,7 +280,6 @@
 .count-control {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 20rpx;
 }
 
@@ -351,14 +351,14 @@
 }
 
 .count-btn {
-  width: 60rpx;
-  height: 60rpx;
+  width: 40rpx;
+  height: 40rpx;
   background-color: #f8f8f8;
   color: #333333;
-  font-size: 32rpx;
-  border-radius: 10rpx;
+  font-size: 24rpx;
+  border-radius: 8rpx;
   border: 1rpx solid #e0e0e0;
-  line-height: 60rpx;
+  line-height: 40rpx;
   padding: 0;
   display: flex;
   align-items: center;

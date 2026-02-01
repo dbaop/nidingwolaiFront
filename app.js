@@ -308,8 +308,10 @@ App({
       method: method,
       header: {
         'content-type': 'application/json',
+        'Accept': 'application/json',
         ...(token && { 'Authorization': `Bearer ${token}` })
       },
+      dataType: 'json',
       success: res => {
         // 处理响应
         if (res.statusCode === 200 || res.statusCode === 201) {

@@ -37,18 +37,33 @@ function request(url, options = {}) {
       data: options.data || {},
       header: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
         'Authorization': token ? `Bearer ${token}` : '',
         ...options.header
       },
+      dataType: 'json',
       success: (res) => {
         console.log('API响应:', {
           url: fullUrl,
           statusCode: res.statusCode,
+          dataType: typeof res.data,
           data: res.data
         });
 
         if (res.statusCode >= 200 && res.statusCode < 300) {
           resolve(res.data);
+        } else if (res.statusCode === 401) {
+          // Token过期或无效，清除本地存储并跳转到登录页
+          console.error('Token无效或已过期');
+          wx.removeStorageSync('token');
+          wx.removeStorageSync('userInfo');
+          wx.removeStorageSync('isLogin');
+          wx.removeStorageSync('userRole');
+          
+          const error = new Error('登录已过期，请重新登录');
+          error.statusCode = 401;
+          error.response = res.data;
+          reject(error);
         } else {
           const error = new Error(res.data.message || '请求失败');
           error.statusCode = res.statusCode;
@@ -71,6 +86,21 @@ function request(url, options = {}) {
  * API 接口封装
  */
 const api = {
+  // 获取活动列表
+  getActivities: () => {
+    return request('/activities/', {
+      method: 'GET'
+    });
+  },
+
+  // 创建活动
+  createActivity: (data) => {
+    return request('/activities/', {
+      method: 'POST',
+      data: data
+    });
+  },
+
   // 用户报名
   enroll: (data) => {
     return request('/enrollments/', {
@@ -102,7 +132,7 @@ const api = {
 
   // 获取活动的报名列表
   getEnrollments: (activityId) => {
-    return request(`/enrollments/?activity_id=${activityId}`, {
+    return request(`/enrollments/activity/${activityId}`, {
       method: 'GET'
     });
   },
@@ -110,6 +140,27 @@ const api = {
   // 获取用户的报名记录
   getUserEnrollments: () => {
     return request('/enrollments/', {
+      method: 'GET'
+    });
+  },
+
+  // 获取已报名的活动
+  getJoinedActivities: () => {
+    return request('/activities/my-participated', {
+      method: 'GET'
+    });
+  },
+
+  // 获取我创建的活动
+  getCreatedActivities: () => {
+    return request('/activities/my-organized', {
+      method: 'GET'
+    });
+  },
+
+  // 获取历史活动（使用我创建的活动接口，前端过滤已完成的活动）
+  getHistoryActivities: () => {
+    return request('/activities/my-organized', {
       method: 'GET'
     });
   }

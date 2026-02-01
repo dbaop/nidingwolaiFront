@@ -16,7 +16,7 @@ Page({
 
   onLoad: function () {
     // 从全局获取用户信息
-    const app = getApp()
+    const app = getApp();
     
     // 严格检查登录状态：必须有有效的用户信息才算登录
     if (app.globalData.isLogin && app.globalData.userInfo && 
@@ -28,7 +28,7 @@ Page({
         },
         isLogin: true,
         userRole: app.globalData.userRole || 'user'
-      })
+      });
     } else {
       // 强制设置为未登录状态
       this.setData({
@@ -38,7 +38,7 @@ Page({
           nickname: '未登录'
         },
         userRole: 'user'
-      })
+      });
       
       // 清除可能存在的无效登录状态
       if (app.globalData.isLogin) {
@@ -57,20 +57,73 @@ Page({
 
   // 加载用户统计数据
   loadUserStats: function() {
-    // 后端未实现用户统计端点，使用默认值
-    this.setData({
-      userStats: {
-        joined: 0,
-        created: 0,
-        friends: 0
+    const { api } = require('../../utils/api.js');
+
+    // 并行请求已创建和已参加的活动数
+    Promise.all([
+      api.getCreatedActivities().catch(() => ({ data: { activities: [], pagination: { total: 0 } } })),
+      api.getJoinedActivities().catch(() => ({ data: { activities: [], pagination: { total: 0 } } }))
+    ]).then(([createdRes, joinedRes]) => {
+      // 解析创建的活动数据
+      let allCreatedActivities = [];
+      if (Array.isArray(createdRes)) {
+        allCreatedActivities = createdRes;
+      } else if (createdRes.data && Array.isArray(createdRes.data)) {
+        allCreatedActivities = createdRes.data;
+      } else if (createdRes.data && createdRes.data.activities && Array.isArray(createdRes.data.activities)) {
+        allCreatedActivities = createdRes.data.activities;
+      } else if (createdRes.activities && Array.isArray(createdRes.activities)) {
+        allCreatedActivities = createdRes.activities;
       }
+
+      // 过滤出未完成的活动（不包括已完成和已取消的）
+      const activeCreatedActivities = allCreatedActivities.filter(activity => {
+        const status = activity.status || 'active';
+        return status !== 'completed' && status !== 'finished' && status !== 'canceled';
+      });
+
+      // 解析已参加的活动数据
+      let allJoinedActivities = [];
+      if (Array.isArray(joinedRes)) {
+        allJoinedActivities = joinedRes;
+      } else if (joinedRes.data && Array.isArray(joinedRes.data)) {
+        allJoinedActivities = joinedRes.data;
+      } else if (joinedRes.data && joinedRes.data.activities && Array.isArray(joinedRes.data.activities)) {
+        allJoinedActivities = joinedRes.data.activities;
+      } else if (joinedRes.activities && Array.isArray(joinedRes.activities)) {
+        allJoinedActivities = joinedRes.activities;
+      }
+
+      // 过滤出未完成的已参加活动
+      const activeJoinedActivities = allJoinedActivities.filter(activity => {
+        const status = activity.status || 'active';
+        return status !== 'completed' && status !== 'finished' && status !== 'canceled';
+      });
+
+      this.setData({
+        userStats: {
+          joined: activeJoinedActivities.length,
+          created: activeCreatedActivities.length,
+          friends: 0 // 好友数暂未实现
+        }
+      });
+    }).catch(err => {
+      console.error('获取用户统计数据失败:', err);
+      // 使用默认值
+      this.setData({
+        userStats: {
+          joined: 0,
+          created: 0,
+          friends: 0
+        }
+      });
     });
   },
 
   // 页面显示时检查登录状态
   onShow: function() {
     // 每次显示页面时重新检查登录状态
-    const app = getApp()
+    const app = getApp();
     
     // 严格检查登录状态：必须有有效的用户信息才算登录
     if (app.globalData.isLogin && app.globalData.userInfo && 
@@ -82,7 +135,7 @@ Page({
         },
         isLogin: true,
         userRole: app.globalData.userRole || 'user'
-      })
+      });
     } else {
       // 强制设置为未登录状态
       this.setData({
@@ -92,7 +145,7 @@ Page({
           nickname: '未登录'
         },
         userRole: 'user'
-      })
+      });
     }
   },
 
@@ -123,70 +176,70 @@ Page({
           icon: 'none'
         });
       }
-    })
+    });
   },
 
   // 跳转到登录页面
   goToLogin: function () {
     wx.navigateTo({
       url: '/pages/login/login'
-    })
+    });
   },
 
   // 前往我的活动
   goToMyActivities: function () {
     wx.switchTab({
       url: '/pages/activity/activity'
-    })
+    });
   },
 
   // 前往收藏
   goToFavorites: function () {
     wx.navigateTo({
       url: '/pages/profile/favorites'
-    })
+    });
   },
 
   // 前往评价
   goToReviews: function () {
     wx.navigateTo({
       url: '/pages/profile/reviews'
-    })
+    });
   },
 
   // 前往钱包
   goToWallet: function () {
     wx.navigateTo({
       url: '/pages/profile/wallet'
-    })
+    });
   },
 
   // 前往设置
   goToSettings: function () {
     wx.navigateTo({
       url: '/pages/profile/settings'
-    })
+    });
   },
 
   // 前往帮助中心
   goToHelp: function () {
     wx.navigateTo({
       url: '/pages/profile/help'
-    })
+    });
   },
 
   // 前往意见反馈
   goToFeedback: function () {
     wx.navigateTo({
       url: '/pages/profile/feedback'
-    })
+    });
   },
 
   // 关于我们
   aboutUs: function () {
     wx.navigateTo({
       url: '/pages/profile/about'
-    })
+    });
   },
 
   // 退出登录
@@ -197,7 +250,7 @@ Page({
       success: (res) => {
         if (res.confirm) {
           // 调用全局登出方法
-          const app = getApp()
+          const app = getApp();
           app.logout(() => {
             // 清除页面用户信息并设置为未登录状态
             this.setData({
@@ -207,43 +260,43 @@ Page({
                 nickname: '未登录'
               },
               userRole: 'user'
-            })
+            });
             
             // 显示退出成功提示
             wx.showToast({
               title: '已退出登录',
               icon: 'success',
               duration: 1500
-            })
+            });
             
             // 延迟后刷新页面状态
             setTimeout(() => {
-              this.onLoad()
-            }, 1500)
-          })
+              this.onLoad();
+            }, 1500);
+          });
         }
       }
-    })
+    });
   },
 
   // 申请商家
   applyForMerchant: function () {
     wx.navigateTo({
       url: '/pages/merchant/apply/apply'
-    })
+    });
   },
 
   // 商家管理
   goToMerchantManage: function () {
     wx.navigateTo({
       url: '/pages/merchant/manage/manage'
-    })
+    });
   },
 
   // 商家审核
   goToMerchantReview: function () {
     wx.navigateTo({
       url: '/pages/merchant/review/review'
-    })
+    });
   }
-})
+});
