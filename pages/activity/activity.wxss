@@ -96,8 +96,152 @@
 
 .activity-status {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
   align-items: center;
+  width: 100%;
+}
+
+/* 评价对话框 */
+.review-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+}
+
+.modal-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #ffffff;
+  border-radius: 24rpx 24rpx 0 0;
+  padding: 30rpx;
+  box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+
+.modal-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333333;
+}
+
+.close-icon {
+  font-size: 48rpx;
+  color: #999999;
+}
+
+.modal-body {
+  margin-bottom: 30rpx;
+}
+
+.rating-section {
+  margin-bottom: 30rpx;
+  text-align: left;
+}
+
+.section-label {
+  font-size: 28rpx;
+  color: #333333;
+  margin-bottom: 20rpx;
+  display: inline-block;
+}
+
+.stars {
+  display: inline-block;
+  margin-left: 10rpx;
+}
+
+.star {
+  font-size: 40rpx;
+  margin-right: 20rpx;
+  cursor: pointer;
+}
+
+.comment-section {
+  margin-bottom: 30rpx;
+  text-align: left;
+}
+
+.comment-textarea {
+  width: 100%;
+  height: 120rpx;
+  border: 1rpx solid #e0e0e0;
+  border-radius: 8rpx;
+  padding: 20rpx;
+  font-size: 28rpx;
+  color: #333333;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.cancel-btn {
+  width: 200rpx;
+  height: 80rpx;
+  background-color: #f0f0f0;
+  color: #333333;
+  font-size: 32rpx;
+  font-weight: bold;
+  border-radius: 40rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.confirm-btn {
+  width: 200rpx;
+  height: 80rpx;
+  background-color: #FF6B8B;
+  color: white;
+  font-size: 32rpx;
+  font-weight: bold;
+  border-radius: 40rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 历史活动评价按钮 */
+.btn-review {
+  width: 120rpx;
+  height: 60rpx;
+  background-color: #FF6B8B;
+  color: white;
+  font-size: 28rpx;
+  font-weight: bold;
+  border-radius: 30rpx;
+  margin-top: 10rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.reviewed-status {
+  font-size: 28rpx;
+  color: #FF6B8B;
+  font-weight: bold;
+  margin-top: 10rpx;
 }
 
 .status-tag {

@@ -89,9 +89,9 @@
               <view class="activity-tags">
                 <text class="tag" wx:for="{{item.tags}}" wx:key="index">{{item}}</text>
               </view>
-              <!-- 根据报名状态显示不同按钮 -->
-              <button class="join-btn {{item.is_enrolled ? 'enrolled' : ''}}" 
-                      wx:if="{{!item.is_enrolled}}"
+              <!-- 根据报名状态和创建者身份显示不同按钮 -->
+              <button class="join-btn {{item.is_enrolled || item.organizer_id == app.globalData.userInfo.id ? 'enrolled' : ''}}" 
+                      wx:if="{{!item.is_enrolled && item.organizer_id != app.globalData.userInfo.id}}"
                       catchtap="showJoinDialog" 
                       data-id="{{item.id}}" 
                       data-price="{{item.price}}" 
@@ -102,6 +102,9 @@
                 <text wx:if="{{item.enrollment_status === 'approved'}}" class="status-approved">已报名</text>
                 <text wx:elif="{{item.enrollment_status === 'pending'}}" class="status-pending">审核中</text>
                 <text wx:elif="{{item.enrollment_status === 'rejected'}}" class="status-rejected">已拒绝</text>
+              </view>
+              <view class="join-status" wx:elif="{{item.organizer_id == app.globalData.userInfo.id}}">
+                <text class="status-creator">我创建的</text>
               </view>
             </view>
           </view>

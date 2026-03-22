@@ -57,12 +57,24 @@ Page({
     const { phone, password } = this.data
     const app = getApp()
 
+    console.log('登录尝试:', { phone, password, canLogin: this.data.canLogin });
+    
+    if (!this.data.canLogin) {
+      wx.showToast({
+        title: '请输入正确的手机号和密码',
+        icon: 'none'
+      });
+      return;
+    }
+
     this.setData({ isLoading: true })
 
     // 使用app.js中封装的phoneLogin方法
     app.phoneLogin(phone, password, (result) => {
       this.setData({ isLoading: false })
 
+      console.log('登录回调结果:', result);
+      
       if (result.success) {
         wx.showToast({
           title: '登录成功',

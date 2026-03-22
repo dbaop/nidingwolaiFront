@@ -6,7 +6,9 @@ Page({
     loading: true,
     hasJoined: false,
     enrollmentStatus: null,
-    userRole: 'user'
+    userRole: 'user',
+    rating: 0,
+    comment: ''
   },
 
   onLoad: function(options) {
@@ -79,7 +81,7 @@ Page({
     const activity = this.data.activity;
     
     // 检查是否是活动创建者
-    if (activity.organizer_id === app.globalData.userId) {
+    if (activity.organizer_id === app.globalData.userInfo.id) {
       wx.showToast({
         title: '创建者不能加入自己的活动',
         icon: 'none'
@@ -182,6 +184,58 @@ Page({
         // 报名失败
         wx.showToast({
           title: res && res.data && res.data.message || err && err.message || '申请失败，请重试',
+          icon: 'none'
+        });
+      }
+    });
+  },
+
+  // 选择评分
+  selectRating: function(e) {
+    const rating = parseInt(e.currentTarget.dataset.rating);
+    this.setData({ rating: rating });
+  },
+
+  // 输入评论
+  onCommentInput: function(e) {
+    this.setData({ comment: e.detail.value });
+  },
+
+  // 提交评价
+  submitReview: function() {
+    const app = getApp();
+    const activity = this.data.activity;
+    
+    if (!this.data.rating) {
+      wx.showToast({
+        title: '请选择评分',
+        icon: 'none'
+      });
+      return;
+    }
+    
+    const formData = {
+      to_user_id: activity.organizer_id,
+      activity_id: activity.id,
+      rating: this.data.rating,
+      comment: this.data.comment || ''
+    };
+    
+    app.request('/reviews/', formData, 'POST', (err, res) => {
+      if (!err && res && res.data) {
+        wx.showToast({
+          title: '评价提交成功',
+          icon: 'success'
+        });
+        
+        // 清空表单
+        this.setData({
+          rating: 0,
+          comment: ''
+        });
+      } else {
+        wx.showToast({
+          title: err && err.message || '评价提交失败，请重试',
           icon: 'none'
         });
       }

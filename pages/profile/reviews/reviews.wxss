@@ -1,0 +1,153 @@
+/* reviews.wxss */
+.container {
+  background-color: #f8f8f8;
+  min-height: 100vh;
+}
+
+.page-header {
+  background-color: white;
+  padding: 30rpx 40rpx;
+  border-bottom: 1rpx solid #eee;
+}
+
+.header-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400rpx;
+  font-size: 32rpx;
+  color: #999;
+}
+
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40rpx 20rpx;
+  background-color: white;
+}
+
+.empty-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40rpx 20rpx;
+  background-color: white;
+}
+
+.empty-image {
+  width: 200rpx;
+  height: 200rpx;
+  margin-bottom: 20rpx;
+}
+
+.empty-text {
+  font-size: 32rpx;
+  color: #666;
+  margin-bottom: 10rpx;
+}
+
+.empty-tip {
+  font-size: 28rpx;
+  color: #999;
+}
+
+.retry-btn {
+  margin-top: 20rpx;
+  width: 200rpx;
+  height: 60rpx;
+  font-size: 28rpx;
+  background-color: #FF6B8B;
+  color: white;
+  border-radius: 30rpx;
+}
+
+.reviews-list {
+  padding: 20rpx;
+}
+
+.review-item {
+  background-color: white;
+  border-radius: 16rpx;
+  margin-bottom: 20rpx;
+  overflow: hidden;
+}
+
+.review-header {
+  padding: 30rpx;
+  border-bottom: 1rpx solid #eee;
+}
+
+.review-activity {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.activity-organizer {
+  font-size: 24rpx;
+  color: #666;
+  margin-top: 10rpx;
+}
+
+.review-date {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.review-content {
+  padding: 30rpx;
+}
+
+.review-rating {
+  margin-bottom: 20rpx;
+  text-align: left;
+}
+
+.rating-label {
+  font-size: 28rpx;
+  color: #666;
+  margin-right: 20rpx;
+  display: inline-block;
+}
+
+.stars {
+  display: inline-block;
+  margin-left: 10rpx;
+}
+
+.star {
+  font-size: 32rpx;
+  margin-right: 10rpx;
+}
+
+.rating-type {
+  font-size: 28rpx;
+  font-weight: bold;
+  margin-left: 20rpx;
+  color: #FF6B8B;
+}
+
+.review-comment {
+  margin-bottom: 20rpx;
+  text-align: left;
+}
+
+.comment-label {
+  font-size: 28rpx;
+  color: #666;
+  margin-right: 20rpx;
+  display: inline-block;
+}
+
+.comment-content {
+  font-size: 28rpx;
+  color: #333;
+}

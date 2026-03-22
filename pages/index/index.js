@@ -407,12 +407,14 @@ Page({
 
       this.closeJoinDialog();
 
-      // 更新活动人数
+      // 更新活动人数和报名状态
       const activities = this.data.activities.map(item => {
         if (item.id === activity.id) {
           return {
             ...item,
-            currentPeople: item.currentPeople + 1
+            currentPeople: item.currentPeople + 1,
+            is_enrolled: true,
+            enrollment_status: 'pending'
           };
         }
         return item;

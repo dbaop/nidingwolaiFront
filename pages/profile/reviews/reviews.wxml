@@ -1,0 +1,58 @@
+<!-- reviews.wxml -->
+<view class="container">
+  <view class="page-header">
+    <text class="header-title">我的评价</text>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <!-- 错误提示 -->
+  <view class="error-container" wx:elif="{{error}}">
+    <image src="/images/empty.png" class="empty-image"></image>
+    <text>{{error}}</text>
+    <button class="retry-btn" bindtap="loadReviews">重新加载</button>
+  </view>
+
+  <!-- 空数据提示 -->
+  <view class="empty-container" wx:else wx:if="{{reviews.length === 0}}">
+    <image src="/images/empty.png" class="empty-image"></image>
+    <text class="empty-text">暂无评价记录</text>
+    <text class="empty-tip">参加活动后可以对组织者进行评价</text>
+  </view>
+
+  <!-- 评价列表 -->
+  <view class="reviews-list" wx:else>
+    <view class="review-item" wx:for="{{reviews}}" wx:key="id">
+      <view class="review-header">
+        <view class="review-activity">
+          <text class="activity-title">{{item.activity.title}}</text>
+          <text class="activity-organizer">创建人：{{item.reviewer.nickname || '未知用户'}}</text>
+        </view>
+        <view class="review-date">
+          <text>{{item.created_at | formatDate}}</text>
+        </view>
+      </view>
+      
+      <view class="review-content">
+        <view class="review-rating">
+          <text class="rating-label">评分：</text>
+          <view class="stars">
+            <text class="star" wx:for="{{[1,2,3,4,5]}}" wx:key="index" wx:if="{{item.rating >= index}}">★</text>
+            <text class="star" wx:for="{{[1,2,3,4,5]}}" wx:key="index" wx:if="{{item.rating < index}}">☆</text>
+          </view>
+          <text class="rating-type" wx:if="{{item.rating >= 4}}">好评</text>
+          <text class="rating-type" wx:elif="{{item.rating <= 2}}">差评</text>
+          <text class="rating-type" wx:else="{{item.rating === 3}}">中评</text>
+        </view>
+        
+        <view class="review-comment" wx:if="{{item.comment}}">
+          <text class="comment-label">评价：</text>
+          <text class="comment-content">{{item.comment}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

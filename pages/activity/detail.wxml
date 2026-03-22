@@ -75,6 +75,25 @@
       </button>
     </view>
 
+    <!-- 评价区域 -->
+    <view class="review-section" wx:if="{{hasJoined && enrollmentStatus === 'attended'}}">
+      <text class="section-title">评价</text>
+      <view class="review-form">
+        <view class="rating-input">
+          <text class="label">评分：</text>
+          <view class="stars">
+            <text class="star" wx:for="{{[1,2,3,4,5]}}" wx:key="index" bindtap="selectRating" data-rating="{{item}}" wx:if="{{item <= rating}}">★</text>
+            <text class="star" wx:for="{{[1,2,3,4,5]}}" wx:key="index" bindtap="selectRating" data-rating="{{item}}" wx:if="{{item > rating}}">☆</text>
+          </view>
+        </view>
+        <view class="comment-input">
+          <text class="label">评论：</text>
+          <textarea placeholder="请输入评价内容" bindinput="onCommentInput" value="{{comment}}"></textarea>
+        </view>
+        <button class="submit-review-btn" bindtap="submitReview">提交评价</button>
+      </view>
+    </view>
+
     <!-- 返回按钮 -->
     <view class="back-button">
       <button type="default" bindtap="backToList">返回列表</button>

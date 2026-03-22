@@ -96,15 +96,46 @@
                 已结束
               </view>
               <text class="people">{{item.currentPeople}}/{{item.totalPeople}}人</text>
+              <!-- 评价按钮 -->
+              <button class="btn-review" wx:if="{{!item.is_reviewed}}" bindtap="showReviewDialog" data-id="{{item.id}}" data-title="{{item.title}}">评价</button>
+              <view class="reviewed-status" wx:elif="{{item.is_reviewed}}">已评价</view>
             </view>
           </view>
         </view>
         
         <!-- 空状态 -->
         <view wx:if="{{historyActivities.length === 0}}" class="empty-state">
-          <image src="/images/empty.png"></image>
+          <image src="../../images/empty.png"></image>
           <text>暂无历史活动</text>
           <button class="btn btn-primary" bindtap="goToCreate">去创建活动</button>
+        </view>
+      </view>
+
+      <!-- 评价对话框 -->
+      <view class="review-modal" wx:if="{{showReviewModal}}">
+        <view class="modal-mask" bindtap="closeReviewDialog"></view>
+        <view class="modal-content">
+          <view class="modal-header">
+            <text class="modal-title">评价 {{reviewActivityTitle}}</text>
+            <text class="close-icon" bindtap="closeReviewDialog">×</text>
+          </view>
+          <view class="modal-body">
+            <view class="rating-section">
+              <text class="section-label">评分：</text>
+              <view class="stars">
+                <text class="star" wx:for="{{[1,2,3,4,5]}}" wx:key="index" bindtap="selectReviewRating" data-rating="{{item}}" wx:if="{{item <= reviewRating}}">★</text>
+                <text class="star" wx:for="{{[1,2,3,4,5]}}" wx:key="index" bindtap="selectReviewRating" data-rating="{{item}}" wx:if="{{item > reviewRating}}">☆</text>
+              </view>
+            </view>
+            <view class="comment-section">
+              <text class="section-label">评论：</text>
+              <textarea class="comment-textarea" placeholder="请输入评价内容（选填）" bindinput="onReviewCommentInput" value="{{reviewComment}}"></textarea>
+            </view>
+          </view>
+          <view class="modal-footer">
+            <button class="cancel-btn" bindtap="closeReviewDialog">取消</button>
+            <button class="confirm-btn" bindtap="submitReview">提交评价</button>
+          </view>
         </view>
       </view>
     </view>

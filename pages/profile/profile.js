@@ -18,9 +18,8 @@ Page({
     // 从全局获取用户信息
     const app = getApp();
     
-    // 严格检查登录状态：必须有有效的用户信息才算登录
-    if (app.globalData.isLogin && app.globalData.userInfo && 
-        app.globalData.userInfo.nickName && app.globalData.userInfo.nickName !== '') {
+    // 检查登录状态：只要有isLogin和userInfo就算登录
+    if (app.globalData.isLogin && app.globalData.userInfo) {
       this.setData({
         userInfo: {
           avatar: app.globalData.userInfo.avatarUrl || '',
@@ -59,22 +58,53 @@ Page({
   loadUserStats: function() {
     const { api } = require('../../utils/api.js');
 
+    // 检查登录状态
+    const app = getApp();
+    if (!app.globalData.isLogin || !app.globalData.userInfo) {
+      console.warn('用户未登录，不加载统计数据');
+      this.setData({
+        userStats: {
+          joined: 0,
+          created: 0,
+          friends: 0
+        }
+      });
+      return;
+    }
+
     // 并行请求已创建和已参加的活动数
     Promise.all([
-      api.getCreatedActivities().catch(() => ({ data: { activities: [], pagination: { total: 0 } } })),
-      api.getJoinedActivities().catch(() => ({ data: { activities: [], pagination: { total: 0 } } }))
+      api.getCreatedActivities().catch(err => {
+        console.error('获取已创建活动失败:', err);
+        return { data: { activities: [], pagination: { total: 0 } } };
+      }),
+      api.getJoinedActivities().catch(err => {
+        console.error('获取已参加活动失败:', err);
+        return { data: { activities: [], pagination: { total: 0 } } };
+      })
     ]).then(([createdRes, joinedRes]) => {
       // 解析创建的活动数据
       let allCreatedActivities = [];
+      console.log('解析创建活动数据:', { createdRes });
+      
       if (Array.isArray(createdRes)) {
+        // 直接返回数组的情况
         allCreatedActivities = createdRes;
-      } else if (createdRes.data && Array.isArray(createdRes.data)) {
-        allCreatedActivities = createdRes.data;
-      } else if (createdRes.data && createdRes.data.activities && Array.isArray(createdRes.data.activities)) {
-        allCreatedActivities = createdRes.data.activities;
-      } else if (createdRes.activities && Array.isArray(createdRes.activities)) {
-        allCreatedActivities = createdRes.activities;
+      } else if (createdRes && typeof createdRes === 'object') {
+        // 对象格式，尝试各种可能的路径
+        if (createdRes.data && Array.isArray(createdRes.data)) {
+          allCreatedActivities = createdRes.data;
+        } else if (createdRes.data && createdRes.data.activities && Array.isArray(createdRes.data.activities)) {
+          allCreatedActivities = createdRes.data.activities;
+        } else if (createdRes.activities && Array.isArray(createdRes.activities)) {
+          allCreatedActivities = createdRes.activities;
+        } else if (createdRes && Array.isArray(Object.values(createdRes))) {
+          // 尝试对象值数组
+          allCreatedActivities = Object.values(createdRes).filter(item => Array.isArray(item))[0] || [];
+        }
       }
+      
+      console.log('解析后的创建活动数据:', allCreatedActivities);
 
       // 过滤出未完成的活动（不包括已完成和已取消的）
       const activeCreatedActivities = allCreatedActivities.filter(activity => {
@@ -84,15 +114,26 @@ Page({
 
       // 解析已参加的活动数据
       let allJoinedActivities = [];
+      console.log('解析已参加活动数据:', { joinedRes });
+      
       if (Array.isArray(joinedRes)) {
+        // 直接返回数组的情况
         allJoinedActivities = joinedRes;
-      } else if (joinedRes.data && Array.isArray(joinedRes.data)) {
-        allJoinedActivities = joinedRes.data;
-      } else if (joinedRes.data && joinedRes.data.activities && Array.isArray(joinedRes.data.activities)) {
-        allJoinedActivities = joinedRes.data.activities;
-      } else if (joinedRes.activities && Array.isArray(joinedRes.activities)) {
-        allJoinedActivities = joinedRes.activities;
+      } else if (joinedRes && typeof joinedRes === 'object') {
+        // 对象格式，尝试各种可能的路径
+        if (joinedRes.data && Array.isArray(joinedRes.data)) {
+          allJoinedActivities = joinedRes.data;
+        } else if (joinedRes.data && joinedRes.data.activities && Array.isArray(joinedRes.data.activities)) {
+          allJoinedActivities = joinedRes.data.activities;
+        } else if (joinedRes.activities && Array.isArray(joinedRes.activities)) {
+          allJoinedActivities = joinedRes.activities;
+        } else if (joinedRes && Array.isArray(Object.values(joinedRes))) {
+          // 尝试对象值数组
+          allJoinedActivities = Object.values(joinedRes).filter(item => Array.isArray(item))[0] || [];
+        }
       }
+      
+      console.log('解析后的已参加活动数据:', allJoinedActivities);
 
       // 过滤出未完成的已参加活动
       const activeJoinedActivities = allJoinedActivities.filter(activity => {
@@ -125,9 +166,8 @@ Page({
     // 每次显示页面时重新检查登录状态
     const app = getApp();
     
-    // 严格检查登录状态：必须有有效的用户信息才算登录
-    if (app.globalData.isLogin && app.globalData.userInfo && 
-        app.globalData.userInfo.nickName && app.globalData.userInfo.nickName !== '') {
+    // 检查登录状态：只要有isLogin和userInfo就算登录
+    if (app.globalData.isLogin && app.globalData.userInfo) {
       this.setData({
         userInfo: {
           avatar: app.globalData.userInfo.avatarUrl || '',
@@ -136,6 +176,9 @@ Page({
         isLogin: true,
         userRole: app.globalData.userRole || 'user'
       });
+      
+      // 登录状态下重新加载用户统计数据
+      this.loadUserStats();
     } else {
       // 强制设置为未登录状态
       this.setData({
@@ -145,6 +188,15 @@ Page({
           nickname: '未登录'
         },
         userRole: 'user'
+      });
+      
+      // 未登录时清除统计数据
+      this.setData({
+        userStats: {
+          joined: 0,
+          created: 0,
+          friends: 0
+        }
       });
     }
   },
@@ -179,6 +231,13 @@ Page({
     });
   },
 
+  // 跳转到评价页面
+  goToReviews: function () {
+    wx.navigateTo({
+      url: '/pages/profile/reviews/reviews'
+    });
+  },
+
   // 跳转到登录页面
   goToLogin: function () {
     wx.navigateTo({
@@ -200,12 +259,7 @@ Page({
     });
   },
 
-  // 前往评价
-  goToReviews: function () {
-    wx.navigateTo({
-      url: '/pages/profile/reviews'
-    });
-  },
+
 
   // 前往钱包
   goToWallet: function () {

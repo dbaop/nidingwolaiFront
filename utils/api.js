@@ -23,6 +23,11 @@ function request(url, options = {}) {
   const token = getToken();
   const fullUrl = `${API_BASE_URL}${url}`;
 
+  // 检查token是否存在
+  if (!token) {
+    console.warn('警告：API请求缺少token，可能需要重新登录');
+  }
+
   console.log('API请求:', {
     url: fullUrl,
     method: options.method || 'GET',
@@ -146,6 +151,7 @@ const api = {
 
   // 获取已报名的活动
   getJoinedActivities: () => {
+    // 每次请求前重新获取token，确保使用最新的token
     return request('/activities/my-participated', {
       method: 'GET'
     });
@@ -153,7 +159,16 @@ const api = {
 
   // 获取我创建的活动
   getCreatedActivities: () => {
+    // 每次请求前重新获取token，确保使用最新的token
     return request('/activities/my-organized', {
+      method: 'GET'
+    });
+  },
+
+  // 获取我的评价
+  getMyReviews: () => {
+    // 每次请求前重新获取token，确保使用最新的token
+    return request('/reviews/my', {
       method: 'GET'
     });
   },

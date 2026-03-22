@@ -47,8 +47,8 @@ App({
     const isLogin = wx.getStorageSync('isLogin');
     const userRole = wx.getStorageSync('userRole');
     
-    // 严格验证登录状态：必须有有效的用户信息才算登录
-    if (userInfo && isLogin && userInfo.nickName && userInfo.nickName !== '') {
+    // 验证登录状态：只要有userInfo和isLogin就算登录
+    if (userInfo && isLogin) {
       this.globalData.userInfo = userInfo;
       this.globalData.isLogin = isLogin;
       this.globalData.userRole = userRole || 'user'; // 默认为普通用户
@@ -151,25 +151,23 @@ App({
                   return;
                 }
                 
-                // 保存用户信息和token
-                this.globalData.userInfo = userRes.userInfo;
+                // 保存用户信息和token（修正：从后端user对象取avatar/nickname）
+                const userInfo = {
+                  avatarUrl: (res.data.user && res.data.user.avatar) || (userRes.userInfo && userRes.userInfo.avatarUrl) || '',
+                  nickName: (res.data.user && res.data.user.nickname) || (userRes.userInfo && userRes.userInfo.nickName) || '',
+                  gender: (res.data.user && res.data.user.gender) || (userRes.userInfo && userRes.userInfo.gender) || 0,
+                  phone: (res.data.user && res.data.user.phone) || '',
+                };
+                this.globalData.userInfo = userInfo;
                 this.globalData.isLogin = true;
-                this.globalData.userRole = res.data.role || 'user'; // 从后端获取用户角色
-                
-                // 保存到本地存储
-                wx.setStorageSync('userInfo', userRes.userInfo);
+                this.globalData.userRole = (res.data.user && res.data.user.role) || 'user';
+                wx.setStorageSync('userInfo', userInfo);
                 wx.setStorageSync('isLogin', true);
-                wx.setStorageSync('userRole', res.data.role || 'user');
-                wx.setStorageSync('token', res.data.token); // 保存JWT令牌
-                
-                // 同时保存到globalData中
-                this.globalData.token = res.data.token;
-                this.globalData.userInfo = userRes.userInfo;
-                this.globalData.isLogin = true;
-                this.globalData.userRole = res.data.role || 'user';
-                
+                wx.setStorageSync('userRole', (res.data.user && res.data.user.role) || 'user');
+                wx.setStorageSync('token', res.data.access_token || res.data.token);
+                this.globalData.token = res.data.access_token || res.data.token;
                 // 调用回调
-                if (callback) callback(userRes.userInfo);
+                if (callback) callback(userInfo);
               });
             },
             fail: err => {
@@ -201,29 +199,21 @@ App({
         return;
       }
       
-      // 保存用户信息和token
+      // 保存用户信息和token（修正：从后端user对象取avatar/nickname）
       const userInfo = {
+        id: (res.data.user && res.data.user.id) || null,
         phone: phone,
-        avatarUrl: res.data.avatar || '',
-        nickName: res.data.nickname || phone
+        avatarUrl: (res.data.user && res.data.user.avatar) || '',
+        nickName: (res.data.user && res.data.user.nickname) || phone
       };
-      
       this.globalData.userInfo = userInfo;
       this.globalData.isLogin = true;
-      this.globalData.userRole = res.data.role || 'user'; // 从后端获取用户角色
-      
-      // 保存到本地存储
+      this.globalData.userRole = (res.data.user && res.data.user.role) || 'user';
       wx.setStorageSync('userInfo', userInfo);
       wx.setStorageSync('isLogin', true);
-      wx.setStorageSync('userRole', res.data.role || 'user');
-      wx.setStorageSync('token', res.data.access_token || res.data.token); // 保存JWT令牌
-      
-      // 同时保存到globalData中
+      wx.setStorageSync('userRole', (res.data.user && res.data.user.role) || 'user');
+      wx.setStorageSync('token', res.data.access_token || res.data.token);
       this.globalData.token = res.data.access_token || res.data.token;
-      this.globalData.userInfo = userInfo;
-      this.globalData.isLogin = true;
-      this.globalData.userRole = res.data.role || 'user';
-      
       // 调用回调
       callback({ success: true });
     });

@@ -7,7 +7,12 @@ Page({
     joinedActivities: [],
     createdActivities: [],
     historyActivities: [],
-    loading: false
+    loading: false,
+    showReviewModal: false,
+    reviewActivityId: null,
+    reviewActivityTitle: '',
+    reviewRating: 0,
+    reviewComment: ''
   },
 
   onLoad: function() {
@@ -80,7 +85,8 @@ Page({
       status: status,
       currentPeople: activity.current_people || activity.current_participants || 0,
       totalPeople: activity.total_people || activity.max_participants || 0,
-      image: image
+      image: image,
+      organizer_id: activity.organizer_id || null
     };
 
     return transformedData;
@@ -100,83 +106,173 @@ Page({
         return [];
       }),
       api.getCreatedActivities().catch(err => {
-        console.error('获取创建的活动失败:', err);
+        console.error('获取我创建的活动失败:', err);
+        return [];
+      }),
+      api.getHistoryActivities().catch(err => {
+        console.error('获取历史活动失败:', err);
         return [];
       })
-    ]).then(([joinedData, createdData]) => {
-      console.log('获取已报名活动成功:', joinedData);
-      console.log('获取创建的活动成功:', createdData);
-
-      // 解析已报名活动数据 - 处理嵌套的 data.activities 结构
+    ]).then(([joinedRes, createdRes, historyRes]) => {
+      console.log('loadAllActivities - 接口调用完成');
+      
+      // 解析已报名活动
       let joinedActivities = [];
-      let joinedRawData = [];
-      if (Array.isArray(joinedData)) {
-        joinedRawData = joinedData;
-      } else if (joinedData.data && Array.isArray(joinedData.data)) {
-        joinedRawData = joinedData.data;
-      } else if (joinedData.data && joinedData.data.activities && Array.isArray(joinedData.data.activities)) {
-        joinedRawData = joinedData.data.activities;
-      } else if (joinedData.activities && Array.isArray(joinedData.activities)) {
-        joinedRawData = joinedData.activities;
+      if (Array.isArray(joinedRes)) {
+        joinedActivities = joinedRes;
+      } else if (joinedRes.data && Array.isArray(joinedRes.data)) {
+        joinedActivities = joinedRes.data;
+      } else if (joinedRes.data && joinedRes.data.activities && Array.isArray(joinedRes.data.activities)) {
+        joinedActivities = joinedRes.data.activities;
+      } else if (joinedRes.activities && Array.isArray(joinedRes.activities)) {
+        joinedActivities = joinedRes.activities;
       }
-
-      console.log('已报名活动原始数据:', joinedRawData);
-      joinedActivities = joinedRawData.map(act => this.transformActivityData(act));
-
-      // 解析创建的活动数据 - 处理嵌套的 data.activities 结构
+      
+      // 解析我创建的活动
       let createdActivities = [];
+      if (Array.isArray(createdRes)) {
+        createdActivities = createdRes;
+      } else if (createdRes.data && Array.isArray(createdRes.data)) {
+        createdActivities = createdRes.data;
+      } else if (createdRes.data && createdRes.data.activities && Array.isArray(createdRes.data.activities)) {
+        createdActivities = createdRes.data.activities;
+      } else if (createdRes.activities && Array.isArray(createdRes.activities)) {
+        createdActivities = createdRes.activities;
+      }
+      
+      // 解析历史活动
       let historyActivities = [];
-      let allCreatedRawData = [];
-
-      if (Array.isArray(createdData)) {
-        allCreatedRawData = createdData;
-      } else if (createdData.data && Array.isArray(createdData.data)) {
-        allCreatedRawData = createdData.data;
-      } else if (createdData.data && createdData.data.activities && Array.isArray(createdData.data.activities)) {
-        allCreatedRawData = createdData.data.activities;
-      } else if (createdData.activities && Array.isArray(createdData.activities)) {
-        allCreatedRawData = createdData.activities;
+      if (Array.isArray(historyRes)) {
+        historyActivities = historyRes;
+      } else if (historyRes.data && Array.isArray(historyRes.data)) {
+        historyActivities = historyRes.data;
+      } else if (historyRes.data && historyRes.data.activities && Array.isArray(historyRes.data.activities)) {
+        historyActivities = historyRes.data.activities;
+      } else if (historyRes.activities && Array.isArray(historyRes.activities)) {
+        historyActivities = historyRes.activities;
       }
-
-      console.log('创建的活动原始数据:', allCreatedRawData);
-
-      // 分类创建的活动：未完成的为"我创建的"，已完成的为"历史活动"
-      allCreatedRawData.forEach(activity => {
-        const transformed = this.transformActivityData(activity);
-        if (transformed.status === 'completed' || transformed.status === 'canceled') {
-          historyActivities.push(transformed);
-        } else {
-          createdActivities.push(transformed);
-        }
-      });
-
+      
+      // 转换数据格式
+      const transformedJoined = joinedActivities.map(activity => this.transformActivityData(activity));
+      const transformedCreated = createdActivities.map(activity => this.transformActivityData(activity));
+      const transformedHistory = historyActivities.map(activity => this.transformActivityData(activity));
+      
+      console.log('loadAllActivities - 数据转换完成');
+      
       this.setData({
-        joinedActivities: joinedActivities,
-        createdActivities: createdActivities,
-        historyActivities: historyActivities,
+        joinedActivities: transformedJoined,
+        createdActivities: transformedCreated,
+        historyActivities: transformedHistory,
         loading: false
       });
-
-      console.log('分类后的活动数据:', {
-        joined: joinedActivities.length,
-        created: createdActivities.length,
-        history: historyActivities.length
-      });
-
-      // 如果所有分类都是空的，显示提示
-      if (joinedActivities.length === 0 && createdActivities.length === 0 && historyActivities.length === 0) {
-        console.warn('所有活动分类都是空的');
-      }
+      
+      console.log('loadAllActivities - 完成');
     }).catch(err => {
-      console.error('获取活动列表失败:', err);
-      console.error('错误详情:', err.message, err.statusCode);
-      // 使用默认数据
-      this.setData({
-        joinedActivities: [],
-        createdActivities: [],
-        historyActivities: [],
-        loading: false
+      console.error('loadAllActivities - 出现错误:', err);
+      this.setData({ loading: false });
+    });
+  },
+
+  // 显示评价对话框
+  showReviewDialog: function(e) {
+    const activityId = e.currentTarget.dataset.id;
+    const title = e.currentTarget.dataset.title;
+    
+    this.setData({
+      showReviewModal: true,
+      reviewActivityId: activityId,
+      reviewActivityTitle: title,
+      reviewRating: 0,
+      reviewComment: ''
+    });
+  },
+
+  // 选择评分
+  selectReviewRating: function(e) {
+    const rating = parseInt(e.currentTarget.dataset.rating);
+    this.setData({ reviewRating: rating });
+  },
+
+  // 输入评论
+  onReviewCommentInput: function(e) {
+    this.setData({ reviewComment: e.detail.value });
+  },
+
+  // 提交评价
+  submitReview: function() {
+    const app = getApp();
+    const { reviewActivityId, reviewRating, reviewComment } = this.data;
+    
+    if (!reviewRating) {
+      wx.showToast({
+        title: '请选择评分',
+        icon: 'none'
       });
+      return;
+    }
+    
+    // 动态获取组织者ID
+    const historyActivities = this.data.historyActivities;
+    const activity = historyActivities.find(act => act.id === reviewActivityId);
+    
+    if (!activity || !activity.organizer_id) {
+      wx.showToast({
+        title: '无法获取活动组织者信息',
+        icon: 'none'
+      });
+      return;
+    }
+    
+    const formData = {
+      to_user_id: activity.organizer_id,
+      activity_id: reviewActivityId,
+      rating: reviewRating,
+      comment: reviewComment || ''
+    };
+    
+    app.request('/reviews/', formData, 'POST', (err, res) => {
+      if (!err && res && res.data) {
+        wx.showToast({
+          title: '评价提交成功',
+          icon: 'success'
+        });
+        
+        // 更新历史活动列表中的评价状态
+        const historyActivities = this.data.historyActivities.map(activity => {
+          if (activity.id === reviewActivityId) {
+            return {
+              ...activity,
+              is_reviewed: true
+            };
+          }
+          return activity;
+        });
+        
+        this.setData({
+          historyActivities: historyActivities,
+          showReviewModal: false,
+          reviewActivityId: null,
+          reviewActivityTitle: '',
+          reviewRating: 0,
+          reviewComment: ''
+        });
+      } else {
+        wx.showToast({
+          title: err && err.message || '评价提交失败，请重试',
+          icon: 'none'
+        });
+      }
+    });
+  },
+
+  // 关闭评价对话框
+  closeReviewDialog: function() {
+    this.setData({
+      showReviewModal: false,
+      reviewActivityId: null,
+      reviewActivityTitle: '',
+      reviewRating: 0,
+      reviewComment: ''
     });
   },
 

@@ -98,6 +98,12 @@
   gap: 20rpx;
 }
 
+.status-creator {
+  color: #FF6B8B;
+  font-size: 28rpx;
+  font-weight: bold;
+}
+
 .activity-card {
   background-color: #ffffff;
   border-radius: 20rpx;
