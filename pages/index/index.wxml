@@ -4,8 +4,8 @@
 
   <!-- 搜索栏 -->
   <view class="search-bar">
-    <input class="search-input" placeholder="搜索活动、地点或标签" bindinput="onSearchInput" />
-    <image class="search-icon" src="https://picsum.photos/seed/search/20/20"></image>
+    <input class="search-input" placeholder="搜索活动、地点或标签" bindinput="onSearchInput" value="{{searchKeyword}}" />
+    <image class="search-icon" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=search%20icon%20simple%20outline%20style%20black%20on%20white%20background&image_size=square" bindtap="onSearch"></image>
   </view>
 
   <!-- 活动分类 -->
@@ -90,11 +90,11 @@
                 <text class="tag" wx:for="{{item.tags}}" wx:key="index">{{item}}</text>
               </view>
               <!-- 根据报名状态和创建者身份显示不同按钮 -->
-              <button class="join-btn {{item.is_enrolled || item.organizer_id == app.globalData.userInfo.id ? 'enrolled' : ''}}" 
-                      wx:if="{{!item.is_enrolled && item.organizer_id != app.globalData.userInfo.id}}"
-                      catchtap="showJoinDialog" 
-                      data-id="{{item.id}}" 
-                      data-price="{{item.price}}" 
+              <button class="join-btn {{item.is_enrolled || (app.globalData.userInfo && item.organizer_id == app.globalData.userInfo.id) ? 'enrolled' : ''}}"
+                      wx:if="{{!item.is_enrolled && (!app.globalData.userInfo || item.organizer_id != app.globalData.userInfo.id)}}"
+                      catchtap="showJoinDialog"
+                      data-id="{{item.id}}"
+                      data-price="{{item.price}}"
                       data-title="{{item.title}}">
                 申请加入
               </button>
@@ -103,7 +103,7 @@
                 <text wx:elif="{{item.enrollment_status === 'pending'}}" class="status-pending">审核中</text>
                 <text wx:elif="{{item.enrollment_status === 'rejected'}}" class="status-rejected">已拒绝</text>
               </view>
-              <view class="join-status" wx:elif="{{item.organizer_id == app.globalData.userInfo.id}}">
+              <view class="join-status" wx:elif="{{app.globalData.userInfo && item.organizer_id == app.globalData.userInfo.id}}">
                 <text class="status-creator">我创建的</text>
               </view>
             </view>

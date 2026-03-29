@@ -8,7 +8,8 @@ Page({
     enrollmentStatus: null,
     userRole: 'user',
     rating: 0,
-    comment: ''
+    comment: '',
+    activityReviews: []
   },
 
   onLoad: function(options) {
@@ -27,6 +28,7 @@ Page({
 
     this.setData({ activityId: activityId });
     this.loadActivityDetail();
+    this.loadActivityReviews();
     this.checkUserStatus();
   },
 
@@ -63,6 +65,19 @@ Page({
             wx.navigateBack();
           }
         });
+      }
+    });
+  },
+
+  // 加载活动评价
+  loadActivityReviews: function() {
+    const app = getApp();
+    app.request(`/reviews/activity/${this.data.activityId}`, {}, 'GET', (err, res) => {
+      if (!err && res && res.data) {
+        this.setData({ activityReviews: res.data });
+      } else {
+        console.error('加载活动评价失败:', err);
+        this.setData({ activityReviews: [] });
       }
     });
   },

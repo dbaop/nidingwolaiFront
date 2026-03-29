@@ -50,5 +50,13 @@ Page({
   // 页面显示时重新加载
   onShow: function() {
     this.loadReviews();
+  },
+
+  // 跳转到活动详情页
+  goToActivityDetail: function(e) {
+    const activityId = e.currentTarget.dataset.id;
+    wx.navigateTo({
+      url: `/pages/activity/detail?id=${activityId}`
+    });
   }
 });

@@ -715,22 +715,6 @@ Page({
       return
     }
     
-    // 调整表单数据格式以匹配后端API期望
-    // 确保日期时间格式包含秒信息，符合ISO 8601标准
-    const formatDateTimeForBackend = (dateTimeStr) => {
-      // 如果字符串已经包含秒信息，则直接返回
-      if (dateTimeStr.includes(':')) {
-        const parts = dateTimeStr.split(':');
-        if (parts.length >= 2) {
-          // 确保格式为 YYYY-MM-DDTHH:MM:SS
-          if (parts[1].length === 2 && !dateTimeStr.includes(':' + parts[1] + ':')) {
-            return dateTimeStr + ':00';
-          }
-        }
-      }
-      return dateTimeStr;
-    };
-    
     const formData = {
       // 确保基本字段存在且格式正确
       type: this.data.activityType,

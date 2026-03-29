@@ -76,9 +76,38 @@
     </view>
 
     <!-- 评价区域 -->
-    <view class="review-section" wx:if="{{hasJoined && enrollmentStatus === 'attended'}}">
+    <view class="review-section">
       <text class="section-title">评价</text>
-      <view class="review-form">
+      
+      <!-- 评价列表 -->
+      <view class="reviews-list">
+        <view class="review-item" wx:for="{{activityReviews}}" wx:key="id">
+          <view class="review-header">
+            <text class="reviewer-name">{{item.reviewer.nickname || item.reviewer.phone}}</text>
+            <text class="review-date">{{item.created_at | formatDate}}</text>
+          </view>
+          <view class="review-content">
+            <view class="review-rating">
+              <view class="stars">
+                <text class="star" wx:for="{{[1,2,3,4,5]}}" wx:key="index" wx:if="{{item.rating >= index}}">★</text>
+                <text class="star" wx:for="{{[1,2,3,4,5]}}" wx:key="index" wx:if="{{item.rating < index}}">☆</text>
+              </view>
+              <text class="rating-type rating-type-good" wx:if="{{item.rating >= 4}}">好评</text>
+              <text class="rating-type rating-type-bad" wx:elif="{{item.rating <= 2}}">差评</text>
+              <text class="rating-type rating-type-neutral" wx:else="{{item.rating === 3}}">中评</text>
+            </view>
+            <view class="review-comment" wx:if="{{item.comment}}">
+              <text>{{item.comment}}</text>
+            </view>
+          </view>
+        </view>
+        <view class="empty-reviews" wx:if="{{activityReviews.length === 0}}">
+          <text>暂无评价</text>
+        </view>
+      </view>
+      
+      <!-- 评价表单 -->
+      <view class="review-form" wx:if="{{hasJoined && enrollmentStatus === 'attended'}}">
         <view class="rating-input">
           <text class="label">评分：</text>
           <view class="stars">

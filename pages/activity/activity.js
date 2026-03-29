@@ -155,7 +155,19 @@ Page({
       // 转换数据格式
       const transformedJoined = joinedActivities.map(activity => this.transformActivityData(activity));
       const transformedCreated = createdActivities.map(activity => this.transformActivityData(activity));
-      const transformedHistory = historyActivities.map(activity => this.transformActivityData(activity));
+      
+      // 转换并过滤历史活动（只显示已完成的活动）
+      const transformedHistory = historyActivities
+        .map(activity => {
+          const transformed = this.transformActivityData(activity);
+          // 默认标记为未评价
+          transformed.is_reviewed = false;
+          return transformed;
+        })
+        .filter(activity => activity.status === 'completed');
+      
+      // 检查用户是否已经评价过这些活动
+      this.checkReviewStatus(transformedHistory);
       
       console.log('loadAllActivities - 数据转换完成');
       
@@ -360,6 +372,31 @@ Page({
             }
           });
         }
+      }
+    });
+  },
+
+  // 检查活动的评价状态
+  checkReviewStatus: function(historyActivities) {
+    const app = getApp();
+    
+    // 获取用户的评价记录
+    app.request('/reviews/my', {}, 'GET', (err, res) => {
+      if (!err && res && res.data) {
+        const reviews = res.data;
+        
+        // 更新历史活动的评价状态
+        const updatedHistoryActivities = historyActivities.map(activity => {
+          const hasReviewed = reviews.some(review => review.activity_id === activity.id);
+          return {
+            ...activity,
+            is_reviewed: hasReviewed
+          };
+        });
+        
+        this.setData({
+          historyActivities: updatedHistoryActivities
+        });
       }
     });
   }

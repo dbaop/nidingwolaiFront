@@ -226,20 +226,27 @@
 .btn-review {
   width: 120rpx;
   height: 60rpx;
-  background-color: #FF6B8B;
-  color: white;
+  background-color: #FFF0E6;
+  color: #FF4400;
   font-size: 28rpx;
-  font-weight: bold;
+  font-weight: 600;
   border-radius: 30rpx;
-  margin-top: 10rpx;
   display: flex;
   justify-content: center;
   align-items: center;
+  border: 1rpx solid #FFB899;
+  transition: all 0.2s ease;
+  box-shadow: 0 2rpx 8rpx rgba(255, 68, 0, 0.1);
+}
+
+.btn-review:active {
+  transform: scale(0.95);
+  box-shadow: 0 1rpx 4rpx rgba(255, 68, 0, 0.15);
 }
 
 .reviewed-status {
   font-size: 28rpx;
-  color: #FF6B8B;
+  color: #FF4400;
   font-weight: bold;
   margin-top: 10rpx;
 }

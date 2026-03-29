@@ -173,9 +173,9 @@ const api = {
     });
   },
 
-  // 获取历史活动（使用我创建的活动接口，前端过滤已完成的活动）
+  // 获取历史活动（使用我参加的活动接口，前端过滤已完成的活动）
   getHistoryActivities: () => {
-    return request('/activities/my-organized', {
+    return request('/activities/my-participated', {
       method: 'GET'
     });
   }

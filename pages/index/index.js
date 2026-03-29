@@ -35,6 +35,12 @@ Page({
     this.loadActivities();
   },
 
+  onShow: function () {
+    console.log('首页显示');
+    // 页面显示时重新加载活动列表，确保获取当前登录用户的报名状态
+    this.loadActivities();
+  },
+
   // 加载活动数据
   loadActivities: function() {
     this.setData({
@@ -152,7 +158,9 @@ Page({
           currentPeople: activity.current_participants || 0,
           totalPeople: activity.max_participants || 0,
           // 映射人均费用字段
-          price: activity.estimated_cost_per_person || 0
+          price: activity.estimated_cost_per_person || 0,
+          // 保留创建者ID
+          organizer_id: activity.organizer_id || null
         };
       });
 
@@ -247,6 +255,175 @@ Page({
     // 可以在这里实现实时搜索功能
   },
 
+  // 搜索按钮点击事件
+  onSearch: function() {
+    const keyword = this.data.searchKeyword.trim();
+    if (!keyword) {
+      wx.showToast({
+        title: '请输入搜索关键词',
+        icon: 'none'
+      });
+      return;
+    }
+
+    this.setData({ loading: true });
+
+    // 从后端API获取活动列表并进行搜索
+    api.getActivities().then(res => {
+      console.log('获取到的活动列表:', res);
+
+      // 处理返回的活动数据 - 支持多种返回格式
+      let activitiesData = [];
+      if (Array.isArray(res)) {
+        activitiesData = res;
+      } else if (res.data && res.data.activities && Array.isArray(res.data.activities)) {
+        activitiesData = res.data.activities;
+      } else if (res.data && Array.isArray(res.data)) {
+        activitiesData = res.data;
+      } else if (res.activities && Array.isArray(res.activities)) {
+        activitiesData = res.activities;
+      } else if (res.status === 'success' && res.data && res.data.activities) {
+        activitiesData = res.data.activities;
+      }
+
+      // 根据关键词搜索活动
+      const filteredActivities = activitiesData.filter(activity => {
+        const title = activity.title || '';
+        const location = activity.location || '';
+        const tags = activity.tags || [];
+        const tagString = Array.isArray(tags) ? tags.join(' ') : tags;
+        
+        return title.includes(keyword) || location.includes(keyword) || tagString.includes(keyword);
+      });
+
+      // 处理活动数据
+      const processedActivities = filteredActivities.map((activity, index) => {
+        // 格式化时间
+        let formattedTime = '';
+        if (activity.start_time) {
+          try {
+            const date = new Date(activity.start_time);
+            if (!isNaN(date.getTime())) {
+              formattedTime = date.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+              });
+            } else {
+              formattedTime = activity.start_time;
+            }
+          } catch (e) {
+            console.error('时间格式化错误:', e);
+            formattedTime = activity.start_time;
+          }
+        }
+
+        // 处理图片路径
+        let imageUrl = '';
+        if (activity.cover_image_url) {
+          if (activity.cover_image_url.startsWith('http://') || activity.cover_image_url.startsWith('https://')) {
+            imageUrl = activity.cover_image_url;
+          } else if (activity.cover_image_url.startsWith('/uploads/')) {
+            imageUrl = 'http://localhost:5000' + activity.cover_image_url;
+          } else {
+            imageUrl = activity.cover_image_url;
+          }
+        } else {
+          // 根据活动类型选择默认图片
+          switch (activity.activity_type) {
+            case 'k歌':
+              imageUrl = '/images/karaoke1.png';
+              break;
+            case '剧本杀':
+              imageUrl = '/images/script1.png';
+              break;
+            case '桌游':
+              imageUrl = '/images/boardgame1.png';
+              break;
+            case '爬山':
+              imageUrl = '/images/hiking1.png';
+              break;
+            default:
+              imageUrl = '/images/karaoke1.png';
+          }
+        }
+
+        console.log('活动:', activity.title, '图片URL:', imageUrl);
+
+        // 处理头像列表
+        let avatarUrls = [];
+        if (activity.avatars && Array.isArray(activity.avatars)) {
+          avatarUrls = activity.avatars.map(avatar => {
+            if (!avatar) return '/images/avatar1.png';
+
+            // 如果是完整的HTTP URL
+            if (avatar.startsWith('http://') || avatar.startsWith('https://')) {
+              return avatar;
+            }
+            // 如果是本地图片路径
+            else if (avatar.startsWith('/images/')) {
+              return avatar;
+            }
+            // 如果是相对路径
+            else if (avatar.startsWith('/uploads/')) {
+              return 'http://localhost:5000' + avatar;
+            }
+            // 其他情况，使用默认头像
+            else {
+              return '/images/avatar1.png';
+            }
+          });
+        }
+
+        // 如果没有头像，使用默认头像
+        if (avatarUrls.length === 0) {
+          avatarUrls = ['/images/avatar1.png', '/images/avatar2.png'];
+        }
+
+        return {
+          ...activity,
+          // 使用处理后的图片路径
+          image: imageUrl,
+          avatars: avatarUrls,
+          imageWithFallback: imageHelper.getImageUrlWithFallback(imageUrl, true),
+          avatarsWithFallback: avatarUrls.map(avatar => imageHelper.getImageUrlWithFallback(avatar, true)),
+          // 使用后端返回的时间字段
+          time: formattedTime,
+          // 使用后端返回的押金金额
+          deposit_amount: activity.deposit_amount || 0,
+          refundDays: 3,
+          // 后端返回的报名状态
+          is_enrolled: activity.is_enrolled || false,
+          enrollment_status: activity.enrollment_status || null,
+          // 映射报名人数字段
+          currentPeople: activity.current_participants || 0,
+          totalPeople: activity.max_participants || 0,
+          // 映射人均费用字段
+          price: activity.estimated_cost_per_person || 0,
+          // 保留创建者ID
+          organizer_id: activity.organizer_id || null
+        };
+      });
+
+      this.setData({
+        activities: processedActivities,
+        loading: false
+      });
+
+      console.log('搜索结果数量:', processedActivities.length);
+      console.log('搜索结果:', processedActivities);
+    }).catch(err => {
+      console.error('搜索活动失败:', err);
+      this.setData({ loading: false });
+      wx.showToast({
+        title: '搜索失败，请重试',
+        icon: 'none'
+      });
+    });
+  },
+
   // 切换活动分类
   switchCategory: function(e) {
     const category = e.currentTarget.dataset.category;
@@ -307,6 +484,21 @@ Page({
     const price = e.currentTarget.dataset.price;
     const title = e.currentTarget.dataset.title;
 
+    // 检查用户是否登录
+    if (!getApp().globalData.userInfo) {
+      wx.showModal({
+        title: '提示',
+        content: '请先登录再报名',
+        showCancel: false,
+        success: () => {
+          wx.navigateTo({
+            url: '/pages/login/login'
+          });
+        }
+      });
+      return;
+    }
+
     // 查找活动详情
     const activity = this.data.activities.find(item => item.id === activityId);
 
@@ -319,6 +511,15 @@ Page({
       if (timeDiff < 60 * 60 * 1000) { // 小于1小时
         wx.showToast({
           title: '活动开始前1小时内不允许报名',
+          icon: 'none'
+        });
+        return;
+      }
+
+      // 检查是否已经报名
+      if (activity.is_enrolled) {
+        wx.showToast({
+          title: '您已经报名过此活动',
           icon: 'none'
         });
         return;
