@@ -99,34 +99,40 @@
     <view class="form-section">
       <text class="section-title">人数设置</text>
       <view class="people-count">
-        <view class="count-row">
-          <view class="count-container">
-            <text class="count-label">当前已有</text>
-            <text class="count-value">{{currentPeople}}</text>
-            <text class="count-unit">人</text>
-            <view class="count-control">
-              <button class="count-btn" bindtap="decreaseCurrent" disabled="{{currentPeople <= 1}}">
-                <text class="btn-text">-</text>
-              </button>
-              <button class="count-btn" bindtap="increaseCurrent" disabled="{{currentPeople >= totalPeople}}">
-                <text class="btn-text">+</text>
-              </button>
+        <!-- 一行两个设置项 -->
+        <view class="count-row-inline">
+          <!-- 当前已有 -->
+          <view class="count-inline">
+            <text class="count-inline-label">当前</text>
+            <view class="count-inline-control">
+              <view class="stepper-btn-small {{currentPeople <= 1 ? 'disabled' : ''}}" bindtap="decreaseCurrent">
+                <text class="stepper-btn-text">−</text>
+              </view>
+              <text class="stepper-num">{{currentPeople}}</text>
+              <view class="stepper-btn-small {{currentPeople >= totalPeople ? 'disabled' : ''}}" bindtap="increaseCurrent">
+                <text class="stepper-btn-text">+</text>
+              </view>
             </view>
           </view>
-          <view class="count-container">
-            <text class="count-label">总共需要</text>
-            <text class="count-value">{{totalPeople}}</text>
-            <text class="count-unit">人</text>
-            <view class="count-control">
-              <button class="count-btn" bindtap="decreaseTotal" disabled="{{totalPeople <= currentPeople}}">
-                <text class="btn-text">-</text>
-              </button>
-              <button class="count-btn" bindtap="increaseTotal" disabled="{{totalPeople >= 20}}">
-                <text class="btn-text">+</text>
-              </button>
+
+          <view class="count-divider"></view>
+
+          <!-- 总共需要 -->
+          <view class="count-inline">
+            <text class="count-inline-label">总需</text>
+            <view class="count-inline-control">
+              <view class="stepper-btn-small {{totalPeople <= currentPeople ? 'disabled' : ''}}" bindtap="decreaseTotal">
+                <text class="stepper-btn-text">−</text>
+              </view>
+              <text class="stepper-num">{{totalPeople}}</text>
+              <view class="stepper-btn-small {{totalPeople >= 20 ? 'disabled' : ''}}" bindtap="increaseTotal">
+                <text class="stepper-btn-text">+</text>
+              </view>
             </view>
           </view>
         </view>
+
+        <!-- 进度条 -->
         <view class="people-progress">
           <view class="progress-bar">
             <view class="progress-fill" style="width: {{(currentPeople/totalPeople)*100}}%"></view>

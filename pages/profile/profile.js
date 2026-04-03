@@ -3,12 +3,17 @@ Page({
   data: {
     userInfo: {
       avatar: '',
-      nickname: ''
+      nickname: '',
+      bio: '',
+      birthday: '',
+      gender: 0,
+      singing_style: '',
+      credit_score: 100
     },
     userStats: {
-      joined: 5,
-      created: 2,
-      friends: 12
+      joined: 0,
+      created: 0,
+      friends: 0
     },
     isLogin: false,
     userRole: 'user'
@@ -161,11 +166,11 @@ Page({
     });
   },
 
-  // 页面显示时检查登录状态
+  // 页面显示时检查登录状态并刷新数据
   onShow: function() {
     // 每次显示页面时重新检查登录状态
     const app = getApp();
-    
+
     // 检查登录状态：只要有isLogin和userInfo就算登录
     if (app.globalData.isLogin && app.globalData.userInfo) {
       this.setData({
@@ -176,7 +181,10 @@ Page({
         isLogin: true,
         userRole: app.globalData.userRole || 'user'
       });
-      
+
+      // 从服务器刷新用户信息
+      this.refreshUserInfo();
+
       // 登录状态下重新加载用户统计数据
       this.loadUserStats();
     } else {
@@ -189,16 +197,71 @@ Page({
         },
         userRole: 'user'
       });
-      
-      // 未登录时清除统计数据
-      this.setData({
-        userStats: {
-          joined: 0,
-          created: 0,
-          friends: 0
-        }
-      });
     }
+  },
+
+  // 从服务器刷新用户信息
+  refreshUserInfo: function() {
+    const app = getApp();
+    const token = wx.getStorageSync('token');
+
+    if (!token) return;
+
+    wx.request({
+      url: app.globalData.config.baseUrl + '/users/me',
+      method: 'GET',
+      header: {
+        'Authorization': 'Bearer ' + token
+      },
+      success: (res) => {
+        if (res.statusCode === 200 && res.data && res.data.data) {
+          const userData = res.data.data;
+          let avatarUrl = userData.avatar || '';
+          // 如果avatar是相对路径，拼接完整URL
+          if (avatarUrl && avatarUrl.startsWith('/')) {
+            avatarUrl = 'http://localhost:5000' + avatarUrl;
+          }
+          // 更新全局数据
+          app.globalData.userInfo = {
+            avatarUrl: avatarUrl,
+            nickName: userData.nickname || '用户',
+            phone: userData.phone || '',
+            bio: userData.bio || '',
+            birthday: userData.birthday || '',
+            gender: userData.gender || 0,
+            singing_style: userData.singing_style || '',
+            credit_score: userData.credit_score || 100
+          };
+          app.globalData.userRole = userData.role || 'user';
+
+          // 更新本地数据
+          this.setData({
+            userInfo: {
+              avatar: avatarUrl,
+              nickname: userData.nickname || '用户',
+              bio: userData.bio || '',
+              birthday: userData.birthday || '',
+              gender: userData.gender || 0,
+              singing_style: userData.singing_style || '',
+              credit_score: userData.credit_score || 100
+            },
+            userRole: userData.role || 'user'
+          });
+
+          // 同时更新统计数据中的信用分
+          const stats = this.data.userStats;
+          stats.credit_score = userData.credit_score || 100;
+          this.setData({ userStats: stats });
+
+          // 同步到 storage
+          wx.setStorageSync('userInfo', app.globalData.userInfo);
+          wx.setStorageSync('userRole', app.globalData.userRole);
+        }
+      },
+      fail: (err) => {
+        console.error('刷新用户信息失败:', err);
+      }
+    });
   },
 
   // 下拉刷新
