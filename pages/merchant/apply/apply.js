@@ -62,6 +62,13 @@ Page({
     })
   },
 
+  // 删除已上传的图片
+  removeImage: function () {
+    this.setData({
+      'formData.license_image': ''
+    })
+  },
+
   // 表单提交
   onSubmit: function (e) {
     const formData = this.data.formData

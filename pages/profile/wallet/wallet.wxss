@@ -1,0 +1,301 @@
+/* pages/profile/wallet/wallet.wxss */
+.container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding: 20rpx;
+}
+
+.wallet-header {
+  margin-bottom: 30rpx;
+}
+
+.balance-card {
+  background: linear-gradient(135deg, #FF6B8B 0%, #ff8fa3 100%);
+  border-radius: 24rpx;
+  padding: 40rpx;
+  color: #fff;
+}
+
+.balance-label {
+  font-size: 28rpx;
+  opacity: 0.9;
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.balance-amount {
+  display: flex;
+  align-items: baseline;
+}
+
+.currency-symbol {
+  font-size: 40rpx;
+  margin-right: 8rpx;
+}
+
+.balance-value {
+  font-size: 72rpx;
+  font-weight: bold;
+}
+
+.balance-hint {
+  font-size: 24rpx;
+  opacity: 0.8;
+  margin-top: 16rpx;
+}
+
+.wallet-section {
+  margin-bottom: 30rpx;
+}
+
+.section-title {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 20rpx;
+  padding-left: 10rpx;
+}
+
+.recharge-card,
+.withdraw-card {
+  background-color: #fff;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+}
+
+.input-label {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.amount-input-wrapper {
+  display: flex;
+  align-items: center;
+  border: 2rpx solid #e8e8e8;
+  border-radius: 12rpx;
+  padding: 0 24rpx;
+  background-color: #fafafa;
+  height: 96rpx;
+}
+
+.amount-prefix {
+  font-size: 40rpx;
+  color: #333;
+  margin-right: 12rpx;
+}
+
+.amount-input {
+  flex: 1;
+  font-size: 40rpx;
+  color: #333;
+  height: 96rpx;
+}
+
+.amount-placeholder {
+  color: #ccc;
+  font-size: 36rpx;
+}
+
+.recharge-methods {
+  margin-top: 30rpx;
+}
+
+.methods-label {
+  font-size: 28rpx;
+  color: #666;
+  display: block;
+  margin-bottom: 20rpx;
+}
+
+.method-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.method-item {
+  display: flex;
+  align-items: center;
+  padding: 24rpx;
+  border: 2rpx solid #e8e8e8;
+  border-radius: 12rpx;
+  background-color: #fff;
+  transition: all 0.3s ease;
+}
+
+.method-item.selected {
+  border-color: #FF6B8B;
+  background-color: #fff5f7;
+}
+
+.method-icon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-right: 20rpx;
+  color: #fff;
+}
+
+.wechat-icon {
+  background-color: #07c160;
+}
+
+.alipay-icon {
+  background-color: #1677ff;
+}
+
+.bank-icon {
+  background-color: #ff6b00;
+}
+
+.method-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.method-name {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+  margin-bottom: 4rpx;
+}
+
+.method-desc {
+  font-size: 22rpx;
+  color: #999;
+}
+
+.method-check {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  background-color: #FF6B8B;
+  color: #fff;
+  font-size: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.recharge-btn {
+  margin-top: 30rpx;
+  width: 100%;
+  height: 96rpx;
+  background: linear-gradient(135deg, #FF6B8B 0%, #FF8E53 100%);
+  border-radius: 48rpx;
+  color: #fff;
+  font-size: 32rpx;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 24rpx rgba(255, 107, 139, 0.3);
+}
+
+.recharge-btn::after {
+  border: none;
+}
+
+.recharge-btn[disabled] {
+  background: #ccc;
+  box-shadow: none;
+}
+
+.withdraw-balance-hint {
+  font-size: 24rpx;
+  color: #666;
+  margin-top: 16rpx;
+}
+
+.highlight {
+  color: #FF6B8B;
+  font-weight: 500;
+}
+
+.withdraw-info {
+  margin-top: 30rpx;
+  padding: 24rpx;
+  background-color: #fafafa;
+  border-radius: 12rpx;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12rpx 0;
+}
+
+.info-row:not(:last-child) {
+  border-bottom: 1rpx solid #eee;
+}
+
+.info-label {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.info-value {
+  font-size: 26rpx;
+  color: #333;
+}
+
+.withdraw-tip {
+  display: flex;
+  align-items: center;
+  margin-top: 24rpx;
+  padding: 16rpx 20rpx;
+  background-color: #fff7e6;
+  border-radius: 8rpx;
+}
+
+.tip-icon {
+  width: 32rpx;
+  height: 32rpx;
+  border-radius: 50%;
+  background-color: #ff9500;
+  color: #fff;
+  font-size: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12rpx;
+}
+
+.tip-text {
+  font-size: 24rpx;
+  color: #995600;
+}
+
+.withdraw-btn {
+  margin-top: 30rpx;
+  width: 100%;
+  height: 96rpx;
+  background-color: #fff;
+  border: 2rpx solid #FF6B8B;
+  border-radius: 48rpx;
+  color: #FF6B8B;
+  font-size: 32rpx;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.withdraw-btn::after {
+  border: none;
+}
+
+.withdraw-btn[disabled] {
+  border-color: #ccc;
+  color: #ccc;
+}

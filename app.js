@@ -47,8 +47,8 @@ App({
     const isLogin = wx.getStorageSync('isLogin');
     const userRole = wx.getStorageSync('userRole');
     
-    // 验证登录状态：只要有userInfo和isLogin就算登录
-    if (userInfo && isLogin) {
+    // 严格验证登录状态：必须有有效的用户信息才算登录
+    if (userInfo && isLogin && userInfo.nickName && userInfo.nickName !== '') {
       this.globalData.userInfo = userInfo;
       this.globalData.isLogin = isLogin;
       this.globalData.userRole = userRole || 'user'; // 默认为普通用户
@@ -68,8 +68,11 @@ App({
 
   // 初始化全局数据
   initGlobalData: function () {
-    // 当用户未登录时，保持userInfo为null，这样申请按钮就不会显示
-    // 只有当用户登录后，才会设置userInfo
+    // 设置默认的用户信息
+    this.globalData.userInfo = {
+      avatarUrl: '',
+      nickName: ''
+    };
   },
 
   // 注册全局错误监听
@@ -150,7 +153,6 @@ App({
                 
                 // 保存用户信息和token（修正：从后端user对象取avatar/nickname）
                 const userInfo = {
-                  id: (res.data.user && res.data.user.id) || null,
                   avatarUrl: (res.data.user && res.data.user.avatar) || (userRes.userInfo && userRes.userInfo.avatarUrl) || '',
                   nickName: (res.data.user && res.data.user.nickname) || (userRes.userInfo && userRes.userInfo.nickName) || '',
                   gender: (res.data.user && res.data.user.gender) || (userRes.userInfo && userRes.userInfo.gender) || 0,
@@ -199,7 +201,6 @@ App({
       
       // 保存用户信息和token（修正：从后端user对象取avatar/nickname）
       const userInfo = {
-        id: (res.data.user && res.data.user.id) || null,
         phone: phone,
         avatarUrl: (res.data.user && res.data.user.avatar) || '',
         nickName: (res.data.user && res.data.user.nickname) || phone

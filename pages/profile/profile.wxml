@@ -156,16 +156,10 @@
       <text class="menu-text">申请商家</text>
       <text class="menu-arrow-text">›</text>
     </view>
-    <!-- 商家管理按钮，仅商家可见 -->
-    <view wx:if="{{userRole === 'merchant'}}" class="menu-item" bindtap="goToMerchantManage">
+    <!-- 商家管理按钮，商家和管理员可见 -->
+    <view wx:if="{{userRole === 'merchant' || userRole === 'admin'}}" class="menu-item" bindtap="goToMerchantManage">
       <view class="menu-icon-text">🏪</view>
       <text class="menu-text">商家管理</text>
-      <text class="menu-arrow-text">›</text>
-    </view>
-    <!-- 商家审核按钮，仅管理员可见 -->
-    <view wx:if="{{userRole === 'admin'}}" class="menu-item" bindtap="goToMerchantReview">
-      <view class="menu-icon-text">⚙️</view>
-      <text class="menu-text">商家审核</text>
       <text class="menu-arrow-text">›</text>
     </view>
   </view>

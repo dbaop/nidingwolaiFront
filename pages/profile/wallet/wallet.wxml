@@ -1,0 +1,95 @@
+<view class="container">
+  <view class="wallet-header">
+    <view class="balance-card">
+      <text class="balance-label">账户余额（元）</text>
+      <view class="balance-amount">
+        <text class="currency-symbol">¥</text>
+        <text class="balance-value">{{balance}}</text>
+      </view>
+      <view class="balance-hint">余额可用于活动押金支付和提现</view>
+    </view>
+  </view>
+
+  <view class="wallet-section">
+    <view class="section-title">充值</view>
+    <view class="recharge-card">
+      <view class="recharge-amount-section">
+        <text class="input-label">充值金额</text>
+        <view class="amount-input-wrapper">
+          <text class="amount-prefix">¥</text>
+          <input class="amount-input" type="digit" placeholder="0.00" placeholder-class="amount-placeholder" value="{{rechargeAmount}}" bindinput="onRechargeAmountInput"/>
+        </view>
+      </view>
+
+      <view class="recharge-methods">
+        <text class="methods-label">选择支付方式</text>
+        <view class="method-list">
+          <view class="method-item {{rechargeMethod === 'wechat' ? 'selected' : ''}}" data-method="wechat" bindtap="selectRechargeMethod">
+            <view class="method-icon wechat-icon">微信</view>
+            <view class="method-info">
+              <text class="method-name">微信支付</text>
+              <text class="method-desc">推荐</text>
+            </view>
+            <view class="method-check" wx:if="{{rechargeMethod === 'wechat'}}">✓</view>
+          </view>
+          <view class="method-item {{rechargeMethod === 'alipay' ? 'selected' : ''}}" data-method="alipay" bindtap="selectRechargeMethod">
+            <view class="method-icon alipay-icon">支</view>
+            <view class="method-info">
+              <text class="method-name">支付宝</text>
+              <text class="method-desc">安全便捷</text>
+            </view>
+            <view class="method-check" wx:if="{{rechargeMethod === 'alipay'}}">✓</view>
+          </view>
+          <view class="method-item {{rechargeMethod === 'bank' ? 'selected' : ''}}" data-method="bank" bindtap="selectRechargeMethod">
+            <view class="method-icon bank-icon">银</view>
+            <view class="method-info">
+              <text class="method-name">银行卡</text>
+              <text class="method-desc">快捷支付</text>
+            </view>
+            <view class="method-check" wx:if="{{rechargeMethod === 'bank'}}">✓</view>
+          </view>
+        </view>
+      </view>
+
+      <button class="recharge-btn" bindtap="doRecharge" disabled="{{!rechargeAmount || rechargeAmount <= 0}}">
+        立即充值
+      </button>
+    </view>
+  </view>
+
+  <view class="wallet-section">
+    <view class="section-title">提现</view>
+    <view class="withdraw-card">
+      <view class="withdraw-amount-section">
+        <text class="input-label">提现金额</text>
+        <view class="amount-input-wrapper">
+          <text class="amount-prefix">¥</text>
+          <input class="amount-input" type="digit" placeholder="0.00" placeholder-class="amount-placeholder" value="{{withdrawAmount}}" bindinput="onWithdrawAmountInput"/>
+        </view>
+        <view class="withdraw-balance-hint">
+          当前可提现余额：<text class="highlight">¥{{balance}}</text>
+        </view>
+      </view>
+
+      <view class="withdraw-info">
+        <view class="info-row">
+          <text class="info-label">开户名</text>
+          <text class="info-value">{{userInfo.real_name || '未设置'}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">银行卡</text>
+          <text class="info-value">{{userInfo.bank_card || '未绑定'}}</text>
+        </view>
+      </view>
+
+      <view class="withdraw-tip">
+        <text class="tip-icon">!</text>
+        <text class="tip-text">提现申请提交后，1-3个工作日内到账</text>
+      </view>
+
+      <button class="withdraw-btn" bindtap="doWithdraw" disabled="{{!withdrawAmount || withdrawAmount <= 0}}">
+        立即提现
+      </button>
+    </view>
+  </view>
+</view>
