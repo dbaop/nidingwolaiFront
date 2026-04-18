@@ -1,0 +1,60 @@
+<view class="container">
+  <view class="header-tip">
+    <text class="tip-icon">!</text>
+    <text class="tip-text">为保障您的资金安全，请添加本人名下的银行卡</text>
+  </view>
+
+  <!-- 银行卡列表 -->
+  <view class="card-list" wx:if="{{cards.length > 0}}">
+    <view wx:for="{{cards}}" wx:key="id" class="bank-card">
+      <view class="card-info">
+        <view class="card-bank">{{item.bank_name}}</view>
+        <view class="card-number">{{item.card_number}}</view>
+        <view class="card-holder">{{item.account_name}}</view>
+      </view>
+      <view class="card-delete" data-id="{{item.id}}" bindtap="deleteCard">
+        <text>删除</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view wx:if="{{cards.length === 0}}" class="empty-state">
+    <view class="empty-icon">💳</view>
+    <text class="empty-text">暂未绑定银行卡</text>
+    <text class="empty-hint">添加银行卡后可用于提现</text>
+  </view>
+
+  <!-- 添加按钮 -->
+  <button class="add-btn" bindtap="showAddModal">
+    <text class="add-icon">+</text>
+    <text class="add-text">添加银行卡</text>
+  </button>
+
+  <!-- 添加银行卡弹窗 -->
+  <view class="modal-mask" wx:if="{{showAddModal}}" bindtap="hideAddModal">
+    <view class="modal-content" catchtap="stopBubble">
+      <view class="modal-title">添加银行卡</view>
+
+      <view class="form-item">
+        <text class="form-label">银行名称</text>
+        <input class="form-input" placeholder="如：中国工商银行" value="{{formData.bank_name}}" bindinput="onBankNameInput"/>
+      </view>
+
+      <view class="form-item">
+        <text class="form-label">卡号</text>
+        <input class="form-input" type="number" placeholder="请输入银行卡号" value="{{formData.card_number}}" bindinput="onCardNumberInput" maxlength="19"/>
+      </view>
+
+      <view class="form-item">
+        <text class="form-label">持卡人姓名</text>
+        <input class="form-input" placeholder="请输入持卡人姓名" value="{{formData.account_name}}" bindinput="onAccountNameInput"/>
+      </view>
+
+      <view class="modal-actions">
+        <button class="cancel-btn" bindtap="hideAddModal">取消</button>
+        <button class="confirm-btn" bindtap="addBankCard">确定</button>
+      </view>
+    </view>
+  </view>
+</view>

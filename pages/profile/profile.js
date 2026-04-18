@@ -327,7 +327,14 @@ Page({
   // 前往钱包
   goToWallet: function () {
     wx.navigateTo({
-      url: '/pages/profile/wallet'
+      url: '/pages/profile/wallet/wallet'
+    });
+  },
+
+  // 前往银行卡管理
+  goToBankCard: function () {
+    wx.navigateTo({
+      url: '/pages/profile/bankcard/bankcard'
     });
   },
 

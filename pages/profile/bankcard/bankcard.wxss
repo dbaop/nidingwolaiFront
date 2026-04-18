@@ -1,0 +1,218 @@
+/* pages/profile/bankcard/bankcard.wxss */
+.container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding: 20rpx;
+}
+
+.header-tip {
+  display: flex;
+  align-items: center;
+  background-color: #fff7e6;
+  padding: 20rpx 24rpx;
+  border-radius: 12rpx;
+  margin-bottom: 30rpx;
+}
+
+.tip-icon {
+  width: 32rpx;
+  height: 32rpx;
+  border-radius: 50%;
+  background-color: #ff9500;
+  color: #fff;
+  font-size: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12rpx;
+}
+
+.tip-text {
+  font-size: 24rpx;
+  color: #995600;
+  flex: 1;
+}
+
+/* 银行卡列表 */
+.card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.bank-card {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-radius: 20rpx;
+  padding: 30rpx;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-info {
+  flex: 1;
+}
+
+.card-bank {
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-bottom: 12rpx;
+}
+
+.card-number {
+  font-size: 28rpx;
+  letter-spacing: 4rpx;
+  margin-bottom: 8rpx;
+  opacity: 0.9;
+}
+
+.card-holder {
+  font-size: 24rpx;
+  opacity: 0.7;
+}
+
+.card-delete {
+  padding: 12rpx 24rpx;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 30rpx;
+  font-size: 24rpx;
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 0;
+}
+
+.empty-icon {
+  font-size: 100rpx;
+  margin-bottom: 30rpx;
+}
+
+.empty-text {
+  font-size: 30rpx;
+  color: #666;
+  margin-bottom: 12rpx;
+}
+
+.empty-hint {
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 添加按钮 */
+.add-btn {
+  position: fixed;
+  bottom: 40rpx;
+  left: 40rpx;
+  right: 40rpx;
+  height: 96rpx;
+  background: linear-gradient(135deg, #FF6B8B 0%, #FF8E53 100%);
+  border-radius: 48rpx;
+  color: #fff;
+  font-size: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 24rpx rgba(255, 107, 139, 0.3);
+}
+
+.add-btn::after {
+  border: none;
+}
+
+.add-icon {
+  font-size: 40rpx;
+  margin-right: 12rpx;
+}
+
+/* 弹窗 */
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  width: 600rpx;
+  background-color: #fff;
+  border-radius: 24rpx;
+  padding: 40rpx;
+}
+
+.modal-title {
+  font-size: 34rpx;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 40rpx;
+}
+
+.form-item {
+  margin-bottom: 30rpx;
+}
+
+.form-label {
+  display: block;
+  font-size: 26rpx;
+  color: #666;
+  margin-bottom: 12rpx;
+}
+
+.form-input {
+  width: 100%;
+  height: 88rpx;
+  padding: 0 24rpx;
+  border: 2rpx solid #e8e8e8;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  box-sizing: border-box;
+  background-color: #fafafa;
+}
+
+.form-input:focus {
+  border-color: #FF6B8B;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 24rpx;
+  margin-top: 40rpx;
+}
+
+.cancel-btn,
+.confirm-btn {
+  flex: 1;
+  height: 88rpx;
+  border-radius: 44rpx;
+  font-size: 30rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}
+
+.cancel-btn {
+  background-color: #f5f5f5;
+  color: #666;
+}
+
+.confirm-btn {
+  background: linear-gradient(135deg, #FF6B8B 0%, #FF8E53 100%);
+  color: #fff;
+}
+
+.cancel-btn::after,
+.confirm-btn::after {
+  border: none;
+}

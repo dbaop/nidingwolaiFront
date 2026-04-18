@@ -10,6 +10,7 @@
     "pages/profile/edit/edit",
     "pages/profile/reviews/reviews",
     "pages/profile/wallet/wallet",
+    "pages/profile/bankcard/bankcard",
     "pages/merchant/apply/apply",
     "pages/merchant/manage/manage",
     "pages/merchant/review/review",

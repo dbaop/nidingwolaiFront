@@ -8,7 +8,9 @@ Page({
     userInfo: {
       real_name: '',
       bank_card: ''
-    }
+    },
+    bankCards: [],
+    selectedCardId: null
   },
 
   onLoad: function () {
@@ -28,11 +30,13 @@ Page({
 
     this.loadWalletInfo();
     this.loadUserInfo();
+    this.loadBankCards();
   },
 
   onShow: function () {
     this.loadWalletInfo();
     this.loadUserInfo();
+    this.loadBankCards();
   },
 
   // 加载钱包信息
@@ -91,6 +95,39 @@ Page({
     });
   },
 
+  // 加载银行卡列表
+  loadBankCards: function () {
+    const app = getApp();
+    const token = wx.getStorageSync('token');
+
+    if (!token) return;
+
+    wx.request({
+      url: app.globalData.config.baseUrl + '/users/bank-cards',
+      method: 'GET',
+      header: {
+        'Authorization': 'Bearer ' + token
+      },
+      success: (res) => {
+        if (res.statusCode === 200 && res.data && res.data.data) {
+          const cards = res.data.data.cards || [];
+          this.setData({
+            bankCards: cards
+          });
+          // 默认选择第一张卡
+          if (cards.length > 0 && !this.data.selectedCardId) {
+            this.setData({
+              selectedCardId: cards[0].id
+            });
+          }
+        }
+      },
+      fail: (err) => {
+        console.error('获取银行卡列表失败:', err);
+      }
+    });
+  },
+
   // 充值金额输入
   onRechargeAmountInput: function (e) {
     this.setData({
@@ -110,6 +147,21 @@ Page({
     const method = e.currentTarget.dataset.method;
     this.setData({
       rechargeMethod: method
+    });
+  },
+
+  // 选择银行卡
+  selectBankCard: function (e) {
+    const cardId = e.currentTarget.dataset.id;
+    this.setData({
+      selectedCardId: cardId
+    });
+  },
+
+  // 跳转到银行卡管理
+  goToBankCard: function () {
+    wx.navigateTo({
+      url: '/pages/profile/bankcard/bankcard'
     });
   },
 
@@ -147,8 +199,6 @@ Page({
       title: '处理中...'
     });
 
-    // 实际项目中这里应该调用微信/支付宝的支付接口
-    // 这里模拟充值成功
     wx.request({
       url: app.globalData.config.baseUrl + '/users/wallet/recharge',
       method: 'POST',
@@ -208,9 +258,9 @@ Page({
       return;
     }
 
-    if (!this.data.userInfo.real_name) {
+    if (this.data.bankCards.length === 0) {
       wx.showToast({
-        title: '请先设置真实姓名',
+        title: '请先绑定银行卡',
         icon: 'none'
       });
       return;
@@ -218,7 +268,7 @@ Page({
 
     wx.showModal({
       title: '确认提现',
-      content: `您将提现 ¥${amount.toFixed(2)} 到绑定的银行卡`,
+      content: `您将提现 ¥${amount.toFixed(2)}`,
       success: (res) => {
         if (res.confirm) {
           this.requestWithdraw(amount);

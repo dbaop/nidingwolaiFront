@@ -71,15 +71,23 @@
         </view>
       </view>
 
-      <view class="withdraw-info">
-        <view class="info-row">
-          <text class="info-label">开户名</text>
-          <text class="info-value">{{userInfo.real_name || '未设置'}}</text>
+      <!-- 银行卡列表 -->
+      <view class="bank-cards-section" wx:if="{{bankCards.length > 0}}">
+        <text class="bank-cards-label">选择到账银行卡</text>
+        <view class="bank-cards-list">
+          <view wx:for="{{bankCards}}" wx:key="id" class="bank-card-item {{selectedCardId === item.id ? 'selected' : ''}}" data-id="{{item.id}}" bindtap="selectBankCard">
+            <view class="card-info">
+              <text class="card-bank">{{item.bank_name}}</text>
+              <text class="card-number">{{item.card_number}}</text>
+            </view>
+            <view class="card-check" wx:if="{{selectedCardId === item.id}}">✓</view>
+          </view>
         </view>
-        <view class="info-row">
-          <text class="info-label">银行卡</text>
-          <text class="info-value">{{userInfo.bank_card || '未绑定'}}</text>
-        </view>
+      </view>
+
+      <view class="no-card-tip" wx:if="{{bankCards.length === 0}}">
+        <text>暂无绑定银行卡，</text>
+        <text class="link" bindtap="goToBankCard">去绑定</text>
       </view>
 
       <view class="withdraw-tip">
