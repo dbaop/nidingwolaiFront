@@ -30,7 +30,8 @@ Page({
 
   // 输入框内容变化时更新数据
   onInputChange: function (e) {
-    const { name, value } = e.detail
+    const name = e.currentTarget.dataset.name
+    const value = e.detail.value
     this.setData({
       [`formData.${name}`]: value
     })
@@ -131,21 +132,25 @@ Page({
     
     // 调用商家申请API
     const app = getApp()
-    app.request(
-      '/merchants/apply',
-      formData,
-      'POST',
-      (res) => {
-        // 隐藏加载提示
+    const token = wx.getStorageSync('token')
+
+    wx.request({
+      url: app.globalData.config.baseUrl + '/users/apply-merchant',
+      method: 'POST',
+      header: {
+        'Authorization': 'Bearer ' + token,
+        'content-type': 'application/json'
+      },
+      data: formData,
+      success: (res) => {
         wx.hideLoading()
-        
+
         if (res.statusCode === 200 || res.statusCode === 201) {
           wx.showModal({
             title: '申请成功',
             content: '您的商家申请已提交，请等待管理员审核',
             showCancel: false,
             success: () => {
-              // 返回上一页
               wx.navigateBack()
             }
           })
@@ -156,8 +161,7 @@ Page({
           })
         }
       },
-      (err) => {
-        // 隐藏加载提示
+      fail: (err) => {
         wx.hideLoading()
         wx.showToast({
           title: '网络错误，请稍后重试',
@@ -165,6 +169,6 @@ Page({
         })
         console.error('申请商家失败:', err)
       }
-    )
+    })
   }
 })
